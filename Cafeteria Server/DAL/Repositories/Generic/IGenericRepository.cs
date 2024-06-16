@@ -13,6 +13,5 @@ namespace CafeteriaServer.Repositories.Generic
         Task<bool> Search(Expression<Func<TEntity, bool>> predicate);
         Task<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
         Task<IEnumerable<TEntity>> FindAll(Expression<Func<TEntity, bool>> predicate);
-
     }
 }

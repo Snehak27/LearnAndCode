@@ -4,7 +4,7 @@ using System;
 
 namespace CafeteriaServer.DAL.Repositories
 {
-    public interface IUserRepository : IGenericRepository<User>
+    public interface IEmployeeResponseRepository : IGenericRepository<EmployeeResponse>
     {
     }
 }

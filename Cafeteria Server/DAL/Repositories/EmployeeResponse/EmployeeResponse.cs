@@ -5,9 +5,9 @@ using System;
 
 namespace CafeteriaServer.DAL.Repositories
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public class EmployeeResponseRepository : GenericRepository<EmployeeResponse>, IEmployeeResponseRepository
     {
-        public UserRepository(CafeteriaContext context) : base(context)
+        public EmployeeResponseRepository(CafeteriaContext context) : base(context)
         {
         }
     }

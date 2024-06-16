@@ -1,13 +1,12 @@
 ﻿using CafeteriaServer.Context;
 using CafeteriaServer.DAL.Models;
 using CafeteriaServer.Repositories.Generic;
-using System;
 
 namespace CafeteriaServer.DAL.Repositories
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public class RecommendedItemRepository : GenericRepository<RecommendedItem>, IRecommendedItemRepository
     {
-        public UserRepository(CafeteriaContext context) : base(context)
+        public RecommendedItemRepository(CafeteriaContext context) : base(context)
         {
         }
     }

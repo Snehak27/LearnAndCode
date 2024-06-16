@@ -1,9 +1,9 @@
 ﻿using CafeteriaServer.Context;
-using CafeteriaServer.Models;
+using CafeteriaServer.DAL.Models;
 using CafeteriaServer.Repositories.Generic;
 using System;
 
-namespace CafeteriaServer.Repositories
+namespace CafeteriaServer.DAL.Repositories
 {
     public class MenuItemRepository : GenericRepository<MenuItem>, IMenuItemRepository
     {

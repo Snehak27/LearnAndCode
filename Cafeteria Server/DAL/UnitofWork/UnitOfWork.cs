@@ -15,11 +15,25 @@ namespace CafeteriaServer.UnitofWork
             Users = new UserRepository(_context);
             MenuItems = new MenuItemRepository(_context);
             Feedbacks = new FeedbackRepository(_context);
+            EmployeeResponses = new EmployeeResponseRepository(_context);
+            EmployeeResponseItems = new EmployeeResponseItemRepository(_context);
+            Recommendations = new RecommendationRepository(_context);
+            RecommendedItems = new RecommendedItemRepository(_context);
+            UserNotifications = new UserNotificationRepository(_context);
+            MealTypes = new MealTypeRepository(_context);
+            NotificationTypes = new NotificationTypeRepository(_context);
         }
 
         public IUserRepository Users { get; }
         public IMenuItemRepository MenuItems { get; }
         public IFeedbackRepository Feedbacks { get; }
+        public IEmployeeResponseRepository EmployeeResponses { get; }
+        public IEmployeeResponseItemRepository EmployeeResponseItems { get; }
+        public IRecommendationRepository Recommendations { get; }
+        public IRecommendedItemRepository RecommendedItems { get; }
+        public IUserNotificationRepository UserNotifications { get; }
+        public IMealTypeRepository MealTypes { get; }
+        public INotificationTypeRepository NotificationTypes { get; }
 
         public void Save()
         {

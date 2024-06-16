@@ -2,12 +2,13 @@
 using CafeteriaServer.DAL.Models;
 using CafeteriaServer.Repositories.Generic;
 using System;
+using System.Threading.Tasks;
 
 namespace CafeteriaServer.DAL.Repositories
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public class MealTypeRepository : GenericRepository<MealType>, IMealTypeRepository
     {
-        public UserRepository(CafeteriaContext context) : base(context)
+        public MealTypeRepository(CafeteriaContext context) : base(context)
         {
         }
     }
