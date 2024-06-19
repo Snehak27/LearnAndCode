@@ -12,6 +12,7 @@ namespace CafeteriaServer.DAL.Models
         public string Comment { get; set; }
         public DateTime FeedbackDate { get; set; }
         public int MealTypeId { get; set; }
+        
 
         public virtual MenuItem MenuItem { get; set; }
         public virtual User User { get; set; }

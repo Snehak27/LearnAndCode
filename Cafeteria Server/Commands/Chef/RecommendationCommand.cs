@@ -7,11 +7,11 @@ namespace CafeteriaServer.Commands
 {
     public class RecommendationCommand : ICommand
     {
-        private readonly IRecommendationService _recommendationService;
+        private readonly IChefService _chefService;
 
-        public RecommendationCommand(IRecommendationService recommendationService)
+        public RecommendationCommand(IChefService chefService)
         {
-            _recommendationService = recommendationService;
+            _chefService = chefService;
         }
 
         public async Task<string> Execute(string requestData)
@@ -20,7 +20,7 @@ namespace CafeteriaServer.Commands
 
             try
             {
-                var mealTypeRecommendations = await _recommendationService.GetRecommendations();
+                var mealTypeRecommendations = await _chefService.GetRecommendations();
                 response.IsSuccess = true;
                 response.MealTypeRecommendations = mealTypeRecommendations;
             }

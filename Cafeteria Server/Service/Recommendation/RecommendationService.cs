@@ -9,14 +9,12 @@ namespace CafeteriaServer.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly SentimentAnalyzer _sentimentAnalyzer;
-        private const int MaxRecommendations = 3;
 
         public RecommendationService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _sentimentAnalyzer = new SentimentAnalyzer();
         }
-
         public async Task<List<MealTypeRecommendations>> GetRecommendations()
         {
             var mealTypes = await _unitOfWork.MealTypes.GetAll();
@@ -34,7 +32,8 @@ namespace CafeteriaServer.Service
                     f.Rating,
                     SentimentScore = _sentimentAnalyzer.AnalyzeSentiment(f.Comment),
                     f.MenuItem.ItemName,
-                    f.Comment
+                    f.Comment,
+                    f.FeedbackDate
                 }).ToList();
 
                 var combinedScores = feedbackWithSentiments
@@ -43,10 +42,18 @@ namespace CafeteriaServer.Service
                     {
                         MenuItemId = g.Key,
                         CombinedScore = g.Average(f => f.Rating * 0.7 + f.SentimentScore * 0.3),
-                        MenuItemName = g.First().ItemName
+                        MenuItemName = g.First().ItemName,
+                        VoteCount = g.Count(),
+                        AverageRating = g.Average(f => f.Rating),
+                        OverallSentiment = _sentimentAnalyzer.GetSentimentLabel(g.Average(f => f.SentimentScore)),
+                        Comments = g.OrderByDescending(c => c.FeedbackDate)
+                                    .Take(2)
+                                    .Concat(g.OrderByDescending(c => Math.Abs(c.SentimentScore)).Take(1))
+                                    .Distinct()
+                                    .Select(c => c.Comment)
+                                    .ToList()
                     })
                     .OrderByDescending(x => x.CombinedScore)
-                    .Take(MaxRecommendations)
                     .ToList();
 
                 var recommendations = combinedScores
@@ -55,7 +62,10 @@ namespace CafeteriaServer.Service
                         MenuItemId = x.MenuItemId,
                         MenuItemName = x.MenuItemName,
                         PredictedRating = x.CombinedScore,
-                        Comments = feedbackWithSentiments.Where(f => f.MenuItemId == x.MenuItemId).Select(f => f.Comment).ToList()
+                        Comments = x.Comments,
+                        VoteCount = x.VoteCount,
+                        AverageRating = x.AverageRating,
+                        OverallSentiment = x.OverallSentiment
                     })
                     .ToList();
 
@@ -67,33 +77,6 @@ namespace CafeteriaServer.Service
             }
 
             return mealTypeRecommendations;
-        }
-        
-        public async Task SaveFinalMenuAsync(List<MealTypeMenuItem> mealTypeMenuItems)
-        {
-            foreach (var mealTypeMenuItem in mealTypeMenuItems)
-            {
-                var recommendation = new Recommendation
-                {
-                    MealTypeId = mealTypeMenuItem.MealTypeId,
-                    RecommendationDate = DateTime.Now
-                };
-
-                await _unitOfWork.Recommendations.Add(recommendation);
-                 _unitOfWork.Save();
-
-                foreach (var menuItemId in mealTypeMenuItem.MenuItemIds)
-                {
-                    var recommendedItem = new RecommendedItem
-                    {
-                        RecommendationId = recommendation.RecommendationId,
-                        MenuItemId = menuItemId
-                    };
-
-                    await _unitOfWork.RecommendedItems.Add(recommendedItem);
-                }
-            }
-            _unitOfWork.Save();
         }
     }
 }

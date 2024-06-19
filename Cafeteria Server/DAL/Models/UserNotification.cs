@@ -10,8 +10,11 @@ namespace CafeteriaServer.DAL.Models
         public int UserId { get; set; }
         public int NotificationTypeId { get; set; }
         public bool IsRead { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public int? MenuItemId { get; set; }
 
         public virtual User User { get; set; }
         public virtual NotificationType NotificationType { get; set; }
+        public virtual MenuItem MenuItem { get; set;}
     }
 }

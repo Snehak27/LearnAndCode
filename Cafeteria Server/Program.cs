@@ -9,6 +9,7 @@ using CafeteriaServer.Server;
 using CafeteriaServer.Commands;
 using CafeteriaServer.DAL.Repositories;
 using CafeteriaServer.Commands.Admin;
+using CafeteriaServer.Commands.Chef;
 
 public class Program
 {
@@ -26,19 +27,24 @@ public class Program
         var employeeService = serviceProvider.GetService<IEmployeeService>();
         var chefService = serviceProvider.GetService<IChefService>();
         var recommendationService = serviceProvider.GetService<IRecommendationService>();
+        var notificationService = serviceProvider.GetService<INotificationService>();
 
         var dispatcher = new CommandDispatcher();
 
-        dispatcher.RegisterCommand("login", new LoginCommand(userService));
+        dispatcher.RegisterCommand("login", new LoginCommand(userService, notificationService));
         dispatcher.RegisterCommand("addMenu", new AddMenuCommand(adminService));
         dispatcher.RegisterCommand("updateMenu", new UpdateMenuCommand(adminService));
         dispatcher.RegisterCommand("deleteMenu", new DeleteMenuCommand(adminService));
         dispatcher.RegisterCommand("viewMenu", new ViewMenuCommand(userService));
         dispatcher.RegisterCommand("feedback", new FeedbackCommand(employeeService));
         dispatcher.RegisterCommand("viewFeedback", new ViewFeedbackCommand(chefService));
-        dispatcher.RegisterCommand("getRecommendations", new RecommendationCommand(recommendationService));
-        dispatcher.RegisterCommand("saveFinalMenu", new SaveFinalMenuCommand(recommendationService));
+        dispatcher.RegisterCommand("getRecommendations", new RecommendationCommand(chefService));
+        dispatcher.RegisterCommand("saveFinalMenu", new SaveFinalMenuCommand(chefService));
         dispatcher.RegisterCommand("viewMonthlyFeedbackReport", new MonthlyFeedbackReportCommand(chefService));
+        dispatcher.RegisterCommand("getEmployeeRecommendations", new EmployeeRecommendationCommand(employeeService));
+        dispatcher.RegisterCommand("saveEmployeeResponse", new SaveEmployeeResponseCommand(employeeService));
+        dispatcher.RegisterCommand("viewEmployeeResponses", new ViewEmployeeResponsesCommand(chefService));
+        dispatcher.RegisterCommand("getPastOrders", new GetPastOrdersCommand(employeeService));
 
         ServerSocket server = new ServerSocket(8888, dispatcher);
         await server.Start();
@@ -55,8 +61,8 @@ public class Program
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IEmployeeResponseRepository, EmployeeResponseRepository>();
-        services.AddScoped<IEmployeeResponseItemRepository, EmployeeResponseItemRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderItemRepository, OrderItemRepository>();
         services.AddScoped<IFeedbackRepository, FeedbackRepository>();
         services.AddScoped<IMenuItemRepository, MenuItemRepository>();
         services.AddScoped<IRecommendationRepository, RecommendationRepository>();
@@ -70,5 +76,6 @@ public class Program
         services.AddScoped<IChefService, ChefService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<IRecommendationService, RecommendationService>();
+        services.AddScoped<INotificationService, NotificationService>();
     }
 }

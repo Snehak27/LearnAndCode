@@ -23,7 +23,7 @@ namespace CafeteriaServer.Server
         {
             try
             {
-                listener = new TcpListener(IPAddress.Parse("192.168.1.36"), port);
+                listener = new TcpListener(IPAddress.Parse("192.168.4.224"), port);
                 listener.Start();
                 Console.WriteLine($"Server started. Listening on port {port}...");
 
@@ -32,7 +32,7 @@ namespace CafeteriaServer.Server
                     TcpClient client = await listener.AcceptTcpClientAsync();
                     Console.WriteLine("Client connected.");
 
-                    Task.Run(() => HandleClient(client));
+                    Task.Run(() => HandleClientAsync(client));
                 }
             }
             catch (Exception ex)
@@ -41,7 +41,7 @@ namespace CafeteriaServer.Server
             }
         }
 
-        private async Task HandleClient(TcpClient client)
+        private async Task HandleClientAsync(TcpClient client)
         {
             try
             {

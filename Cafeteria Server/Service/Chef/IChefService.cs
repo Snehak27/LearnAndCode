@@ -7,5 +7,8 @@ namespace CafeteriaServer.Service
     {
         Task<List<FeedbackDTO>> GetAllFeedbacks();
         Task<MonthlyFeedbackReportResponse> GetMonthlyFeedbackReportAsync(MonthlyFeedbackReportRequest request);
+        Task<List<EmployeeResponseSummary>> GetEmployeeResponses();
+        Task SaveFinalMenuAsync(List<MealTypeMenuItem> mealTypeMenuItems);
+        Task<List<MealTypeRecommendations>> GetRecommendations();
     }
 }

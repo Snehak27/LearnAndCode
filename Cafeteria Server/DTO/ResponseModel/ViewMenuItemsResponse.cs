@@ -1,7 +1,7 @@
 ﻿using CafeteriaServer.DAL.Models;
 using System;
 
-namespace CafeteriaServer.DTO.ResponseModel
+namespace CafeteriaServer.DTO
 {
     public class ViewMenuItemsResponse
     {

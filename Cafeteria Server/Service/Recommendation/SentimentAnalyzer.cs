@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace CafeteriaServer.Service
 {
@@ -8,11 +9,19 @@ namespace CafeteriaServer.Service
 
         public SentimentAnalyzer()
         {
-            _sentimentLexicon = new Dictionary<string, int>
+            var lexiconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Service", "sentiment_lexicon.json");
+            _sentimentLexicon = LoadSentimentLexicon(lexiconPath);
+        }
+
+        private Dictionary<string, int> LoadSentimentLexicon(string path)
         {
-            { "good", 1 }, { "excellent", 2 }, { "amazing", 2 },
-            { "bad", -1 }, { "poor", -2 }, { "terrible", -2 }
-        };
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException("Sentiment lexicon file not found.", path);
+            }
+
+            var json = File.ReadAllText(path);
+            return JsonConvert.DeserializeObject<Dictionary<string, int>>(json);
         }
 
         public double AnalyzeSentiment(string comment)
@@ -21,12 +30,19 @@ namespace CafeteriaServer.Service
             double sentimentScore = 0;
             foreach (var word in words)
             {
-                if (_sentimentLexicon.TryGetValue(word, out var score))
+                if (_sentimentLexicon.TryGetValue(word.ToLower(), out var score))
                 {
                     sentimentScore += score;
                 }
             }
-            return sentimentScore / words.Length;
+            return words.Length > 0 ? sentimentScore / words.Length : 0;
+        }
+
+        public string GetSentimentLabel(double sentimentScore)
+        {
+            if (sentimentScore > 0.5) return "Positive";
+            if (sentimentScore < -0.5) return "Negative";
+            return "Neutral";
         }
     }
 }

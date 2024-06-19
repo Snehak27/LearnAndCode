@@ -1,4 +1,4 @@
-﻿using CafeteriaServer.DTO.ResponseModel;
+﻿using CafeteriaServer.DTO;
 using CafeteriaServer.Service;
 using Newtonsoft.Json;
 using System;

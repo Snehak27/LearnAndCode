@@ -21,5 +21,30 @@ namespace CafeteriaServer.DTO
         public string MenuItemName { get; set; }
         public double PredictedRating { get; set; }
         public List<string> Comments { get; set; }
+        public int RecommendedItemId { get; set; }
+        public int VoteCount { get; set; }
+        public double AverageRating { get; set; }
+        public string OverallSentiment { get; set; }
+
+
+    }
+    public class CommentDTO
+    {
+        public string Comment { get; set; }
+        public string Sentiment { get; set; }
+        public DateTime Date { get; set; }
+    }
+    public class EmployeeRecommendationResponse
+    {
+        public bool IsSuccess { get; set; }
+        public string ErrorMessage { get; set; }
+        public List<MealTypeRecommendation> MealTypeRecommendations { get; set; }
+    }
+    public class MealTypeRecommendation
+    {
+        public int MealTypeId { get; set; }
+        public string MealTypeName { get; set; }
+        public List<RecommendedItemDTO> RecommendedItems { get; set; }
     }
 }
+

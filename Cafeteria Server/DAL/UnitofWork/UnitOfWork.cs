@@ -15,8 +15,8 @@ namespace CafeteriaServer.UnitofWork
             Users = new UserRepository(_context);
             MenuItems = new MenuItemRepository(_context);
             Feedbacks = new FeedbackRepository(_context);
-            EmployeeResponses = new EmployeeResponseRepository(_context);
-            EmployeeResponseItems = new EmployeeResponseItemRepository(_context);
+            Orders = new OrderRepository(_context);
+            OrderItems = new OrderItemRepository(_context);
             Recommendations = new RecommendationRepository(_context);
             RecommendedItems = new RecommendedItemRepository(_context);
             UserNotifications = new UserNotificationRepository(_context);
@@ -27,8 +27,8 @@ namespace CafeteriaServer.UnitofWork
         public IUserRepository Users { get; }
         public IMenuItemRepository MenuItems { get; }
         public IFeedbackRepository Feedbacks { get; }
-        public IEmployeeResponseRepository EmployeeResponses { get; }
-        public IEmployeeResponseItemRepository EmployeeResponseItems { get; }
+        public IOrderRepository Orders { get; }
+        public IOrderItemRepository OrderItems { get; }
         public IRecommendationRepository Recommendations { get; }
         public IRecommendedItemRepository RecommendedItems { get; }
         public IUserNotificationRepository UserNotifications { get; }
