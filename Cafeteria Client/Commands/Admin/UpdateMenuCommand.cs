@@ -22,11 +22,24 @@ namespace CafeteriaClient.Commands.Admin
                 if (response.IsSuccess)
                 {
                     Console.WriteLine("Menu Items:");
-                    for (int i = 0; i < response.MenuItems.Count; i++)
+                    Console.WriteLine("-----------------------------------------------------------------------------------");
+                    Console.WriteLine("| {0, -10} | {1, -20}  | {3, 10} | {1, -20} ", "ID", "Name", "Description", "Price", "AvailabilityStatus");
+                    Console.WriteLine("-----------------------------------------------------------------------------------");
+
+                    int serialNumber = 1;
+                    foreach (var menuItem in response.MenuItems)
                     {
-                        var menuItem = response.MenuItems[i];
-                        Console.WriteLine($"{i + 1}. Name: {menuItem.ItemName}, Description: {menuItem.Description}, Price: {menuItem.Price}");
+                        Console.WriteLine("| {0, -10} | {1, -20} | {3, 10} | {1,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, menuItem.AvailabilityStatus);
+                        serialNumber++;
                     }
+
+                    Console.WriteLine("-----------------------------------------------------------------------------------");
+                    //Console.WriteLine("Menu Items:");
+                    //for (int i = 0; i < response.MenuItems.Count; i++)
+                    //{
+                    //    var menuItem = response.MenuItems[i];
+                    //    Console.WriteLine($"{i + 1}. Name: {menuItem.ItemName}, Description: {menuItem.Description}, Price: {menuItem.Price}");
+                    //}
                 }
                 else
                 {
@@ -49,10 +62,6 @@ namespace CafeteriaClient.Commands.Admin
                 string newName = Console.ReadLine();
                 if (string.IsNullOrEmpty(newName)) newName = menuItemToUpdate.ItemName;
 
-                Console.WriteLine("Enter new description (leave blank to keep current):");
-                string newDescription = Console.ReadLine();
-                if (string.IsNullOrEmpty(newDescription)) newDescription = menuItemToUpdate.Description;
-
                 Console.WriteLine("Enter new price (leave blank to keep current):");
                 string newPriceInput = Console.ReadLine();
                 double newPrice = menuItemToUpdate.Price;
@@ -61,12 +70,20 @@ namespace CafeteriaClient.Commands.Admin
                     newPrice = parsedPrice;
                 }
 
+                Console.WriteLine("Enter new availability status (true/false, leave blank to keep current):");
+                string newAvailabilityStatusInput = Console.ReadLine();
+                bool newAvailabilityStatus = menuItemToUpdate.AvailabilityStatus;
+                if (!string.IsNullOrEmpty(newAvailabilityStatusInput) && bool.TryParse(newAvailabilityStatusInput, out bool parsedAvailabilityStatus))
+                {
+                    newAvailabilityStatus = parsedAvailabilityStatus;
+                }
+
                 var updateMenuItemRequest = new MenuItem
                 {
                     MenuItemId = menuItemToUpdate.MenuItemId,
                     ItemName = newName,
-                    Description = newDescription,
-                    Price = newPrice
+                    Price = newPrice,
+                    AvailabilityStatus = newAvailabilityStatus
                 };
 
                 string updateRequestJson = JsonConvert.SerializeObject(updateMenuItemRequest);
@@ -95,4 +112,3 @@ namespace CafeteriaClient.Commands.Admin
         }
     }
 }
-

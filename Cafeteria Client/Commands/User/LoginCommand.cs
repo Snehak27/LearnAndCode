@@ -7,9 +7,9 @@ namespace CafeteriaClient
 {
     public class LoginCommand : ICommand
     {
-        private readonly Func<int, Task> _onLoginSuccess;
+        private readonly Func<int, int, Task> _onLoginSuccess;
 
-        public LoginCommand(Func<int, Task> onLoginSuccess)
+        public LoginCommand(Func<int,int, Task> onLoginSuccess)
         {
             _onLoginSuccess = onLoginSuccess;
         }
@@ -42,7 +42,18 @@ namespace CafeteriaClient
             if (response.IsAuthenticated)
             {
                 Console.WriteLine("Authentication successful.");
-                await _onLoginSuccess(response.User.UserId);
+
+                // Display notifications
+                if (response.Notifications != null && response.Notifications.Any())
+                {
+                    Console.WriteLine("\nNotifications:");
+                    foreach (var notification in response.Notifications)
+                    {
+                        Console.WriteLine($"- {notification.Message} (Received on: {notification.CreatedAt})");
+                    }
+                }
+
+                await _onLoginSuccess(response.User.UserId, response.User.RoleId);
             }
             else
             {

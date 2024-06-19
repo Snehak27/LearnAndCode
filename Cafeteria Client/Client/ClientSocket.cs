@@ -30,7 +30,7 @@ namespace CafeteriaClient
 
             return responseJson;
         }
-
+        
         public void Close()
         {
             _stream.Close();

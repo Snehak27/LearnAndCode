@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CafeteriaClient.DTO.Response;
+using System;
 
 namespace CafeteriaClient.DTO
 {
@@ -7,6 +8,7 @@ namespace CafeteriaClient.DTO
         public bool IsAuthenticated { get; set; }
         public User User { get; set; }
         public string ErrorMessage { get; set; }
+        public List<NotificationResponse> Notifications { get; set; }
     }
 
     public class User

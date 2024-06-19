@@ -13,7 +13,7 @@ namespace CafeteriaClient.Commands
                 var request = new RequestObject
                 {
                     CommandName = "viewMenu",
-                    RequestData = string.Empty 
+                    RequestData = string.Empty
                 };
 
                 string responseJson = await clientSocket.SendRequest(request);
@@ -22,10 +22,17 @@ namespace CafeteriaClient.Commands
                 if (response.IsSuccess)
                 {
                     Console.WriteLine("Menu Items:");
+                    Console.WriteLine("-----------------------------------------------------------------------------------------");
+                    Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", "ID", "Name", "Price", "AvailabilityStatus");
+                    Console.WriteLine("-----------------------------------------------------------------------------------------");
+
+                    int serialNumber = 1;
                     foreach (var menuItem in response.MenuItems)
                     {
-                        Console.WriteLine($"ID: {menuItem.MenuItemId}, Name: {menuItem.ItemName}, Description: {menuItem.Description}, Price: {menuItem.Price}");
+                        Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, menuItem.AvailabilityStatus);
                     }
+
+                    Console.WriteLine("-----------------------------------------------------------------------------------------");
                 }
                 else
                 {

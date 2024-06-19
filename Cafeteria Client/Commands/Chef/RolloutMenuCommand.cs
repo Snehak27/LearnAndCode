@@ -1,6 +1,7 @@
 ﻿using CafeteriaClient.DTO;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace CafeteriaClient.Commands
 {
@@ -31,15 +32,20 @@ namespace CafeteriaClient.Commands
                 {
                     string mealTypeName = GetMealTypeName(mealTypeRecommendation.MealTypeId);
                     Console.WriteLine($"\n{mealTypeName}:");
+                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+                    Console.WriteLine("| {0, -4} | {1, -20} | {2, -20} | {3, -10} | {4, -10} | {5, -10} | {6, -30} ",
+                        "Sl No.", "Name", "Overall Rating", "No. of Votes", "Avg Rating", "Sentiment", "Comments");
+                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+
                     for (int i = 0; i < mealTypeRecommendation.Recommendations.Count; i++)
                     {
                         var recommendation = mealTypeRecommendation.Recommendations[i];
-                        Console.WriteLine($"{i + 1}. {recommendation.MenuItemName} (Rating: {recommendation.PredictedRating:F2})");
-                        foreach (var comment in recommendation.Comments)
-                        {
-                            Console.WriteLine($"  Comment: {comment}");
-                        }
+                        Console.WriteLine("| {0, -4} | {1, -20} | {2, -20:F2} | {3, -10} | {4, -10:F2} | {5, -10} | {6, -30} ",
+                            (i + 1), recommendation.MenuItemName, recommendation.PredictedRating, recommendation.VoteCount,
+                            recommendation.AverageRating, recommendation.OverallSentiment, string.Join(", ", recommendation.Comments));
                     }
+
+                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
                 }
 
                 // Fetch the full menu list from the server
@@ -60,11 +66,17 @@ namespace CafeteriaClient.Commands
 
                 // Display full menu list to the chef
                 Console.WriteLine("\nFull Menu Items:");
+                Console.WriteLine("----------------------------------------------------------------------------------");
+                Console.WriteLine("| {0, -4} | {1, -20} | {2, 10} ", "Sl No.", "Name", "Price");
+                Console.WriteLine("-----------------------------------------------------------------------------------");
+
                 for (int i = 0; i < menuResponse.MenuItems.Count; i++)
                 {
                     var menuItem = menuResponse.MenuItems[i];
-                    Console.WriteLine($"{i + 1}. {menuItem.ItemName} - {menuItem.Description} - {menuItem.Price:C}");
+                    Console.WriteLine("| {0, -4} | {1, -20} | {2, 10}  ", (i + 1), menuItem.ItemName, menuItem.Price);
                 }
+
+                Console.WriteLine("-----------------------------------------------------------------------------------");
 
                 // Allow chef to select items from recommendations and full menu for each meal type
                 var selectedMealTypeMenuItems = new List<MealTypeMenuItem>();

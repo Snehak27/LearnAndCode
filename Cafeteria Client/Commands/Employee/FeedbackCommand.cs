@@ -2,6 +2,7 @@
 using CafeteriaClient.DTO.Request;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 
 namespace CafeteriaClient.Commands
 {
@@ -18,51 +19,59 @@ namespace CafeteriaClient.Commands
         {
             try
             {
-                var request = new RequestObject
+                var userId = _getUserId();
+
+                // Request past orders for the last week
+                var requestPastOrders = new RequestObject
                 {
-                    CommandName = "viewMenu",
-                    RequestData = string.Empty
+                    CommandName = "getPastOrders",
+                    RequestData = JsonConvert.SerializeObject(new { UserId = userId })
                 };
 
-                string responseJson = await clientSocket.SendRequest(request);
-                var response = JsonConvert.DeserializeObject<ViewMenuItemsResponse>(responseJson);
+                string pastOrdersResponseJson = await clientSocket.SendRequest(requestPastOrders);
+                var pastOrdersResponse = JsonConvert.DeserializeObject<PastOrdersResponse>(pastOrdersResponseJson);
 
-                if (response.IsSuccess)
+                if (!pastOrdersResponse.IsSuccess)
                 {
-                    Console.WriteLine("Menu Items:");
-                    for (int i = 0; i < response.MenuItems.Count; i++)
-                    {
-                        var menuItem = response.MenuItems[i];
-                        Console.WriteLine($"{i + 1}. Name: {menuItem.ItemName}, Description: {menuItem.Description}, Price: {menuItem.Price:C}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Failed to retrieve menu items: " + response.ErrorMessage);
+                    Console.WriteLine($"Failed to retrieve past orders: {pastOrdersResponse.ErrorMessage}");
                     return;
                 }
 
-                Console.WriteLine("Enter the number of the menu item to provide feedback:");
-                int itemNumber;
-                if (!int.TryParse(Console.ReadLine(), out itemNumber) || itemNumber < 1 || itemNumber > response.MenuItems.Count)
+                var pastOrders = pastOrdersResponse.PastOrders;
+
+                if (pastOrders.Count == 0)
                 {
-                    Console.WriteLine("Invalid selection.");
+                    Console.WriteLine("You have no past orders for the last week.");
                     return;
                 }
 
-                Console.WriteLine("Enter the meal type (1 for Breakfast, 2 for Lunch, 3 for Dinner):");
-                int mealTypeId;
-                if (!int.TryParse(Console.ReadLine(), out mealTypeId) || mealTypeId < 1 || mealTypeId > 3)
+                Console.WriteLine("Past Orders for the Last Week:");
+                Console.WriteLine("---------------------------------------------------------------");
+                Console.WriteLine("| {0, -5} | {1, -30} | {2, -20} | {3, -10} |", "Sl No", "Menu Item", "Order Date", "Meal Type");
+                Console.WriteLine("---------------------------------------------------------------");
+
+                int serialNumber = 1;
+                var orderMapping = new Dictionary<int, PastOrderDTO>();
+                foreach (var order in pastOrders)
                 {
-                    Console.WriteLine("Invalid meal type. Please enter 1 for Breakfast, 2 for Lunch, or 3 for Dinner.");
+                    orderMapping[serialNumber] = order;
+                    Console.WriteLine("| {0, -5} | {1, -30} | {2, -20} | {3, -10} |", serialNumber, order.MenuItemName, order.OrderDate, GetMealTypeName(order.MealTypeId));
+                    serialNumber++;
+                }
+
+                Console.WriteLine("---------------------------------------------------------------");
+
+                Console.WriteLine("Enter the serial number for which you want to provide feedback:");
+                int serialNo;
+                if (!int.TryParse(Console.ReadLine(), out serialNo) || !orderMapping.ContainsKey(serialNo))
+                {
+                    Console.WriteLine("Invalid serial number.");
                     return;
                 }
 
-                // Get the selected menu item
-                var selectedMenuItem = response.MenuItems[itemNumber - 1];
-                int userId = _getUserId();
-              
-                Console.WriteLine("Enter your rating (1 to 5):");
+                var selectedOrder = orderMapping[serialNo];
+
+                Console.WriteLine("Enter your rating (1-5):");
                 int rating;
                 if (!int.TryParse(Console.ReadLine(), out rating) || rating < 1 || rating > 5)
                 {
@@ -75,11 +84,11 @@ namespace CafeteriaClient.Commands
 
                 var feedbackRequest = new FeedbackRequest
                 {
-                    MenuItemId = selectedMenuItem.MenuItemId,
+                    MenuItemId = selectedOrder.MenuItemId,
                     UserId = userId,
                     Comment = feedback,
                     Rating = rating,
-                    MealTypeId = mealTypeId
+                    MealTypeId = selectedOrder.MealTypeId
                 };
 
                 string feedbackRequestJson = JsonConvert.SerializeObject(feedbackRequest);
@@ -105,6 +114,17 @@ namespace CafeteriaClient.Commands
             {
                 Console.WriteLine($"Error executing feedback command: {ex.Message}");
             }
+        }
+
+        public static string GetMealTypeName(int mealTypeId)
+        {
+            return mealTypeId switch
+            {
+                1 => "Breakfast",
+                2 => "Lunch",
+                3 => "Dinner",
+                _ => "Unknown"
+            };
         }
     }
 }

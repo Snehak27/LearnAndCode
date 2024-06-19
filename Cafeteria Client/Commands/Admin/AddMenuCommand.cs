@@ -11,17 +11,22 @@ namespace CafeteriaClient.Commands
             Console.WriteLine("Enter menu item name:");
             string itemName = Console.ReadLine();
 
-            Console.WriteLine("Enter description:");
-            string description = Console.ReadLine();
-
             Console.WriteLine("Enter price:");
             double price = Convert.ToDouble(Console.ReadLine());
+
+            Console.WriteLine("Enter availability status (true/false):");
+            string availabilityStatusInput = Console.ReadLine();
+            bool availabilityStatus = false;
+            if (!string.IsNullOrEmpty(availabilityStatusInput) && bool.TryParse(availabilityStatusInput, out bool parsedAvailabilityStatus))
+            {
+                availabilityStatus = parsedAvailabilityStatus;
+            }
 
             var menuItem= new MenuItemRequest
             {
                 ItemName = itemName,
-                Description = description,
-                Price = price
+                Price = price,
+                AvailabilityStatus = availabilityStatus,
             };
 
             string menurequestJson = JsonConvert.SerializeObject(menuItem);

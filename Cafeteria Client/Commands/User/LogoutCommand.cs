@@ -17,6 +17,7 @@ namespace CafeteriaClient.Commands
         {
             _onLogout.Invoke();
             Console.WriteLine("Logged out successfully");
+            Console.WriteLine();
         }
     }
 }

@@ -22,10 +22,16 @@ namespace CafeteriaClient.Commands.Chef
                 if (response.IsSuccess)
                 {
                     Console.WriteLine("Employee Feedback:");
+                    Console.WriteLine("----------------------------------------------------------------------------------");
+                    Console.WriteLine("| {0, -30} | {1, 6} | {2, -40} ", "Menu Item", "Rating", "Comment");
+                    Console.WriteLine("----------------------------------------------------------------------------------");
+
                     foreach (var feedback in response.Feedbacks)
                     {
-                        Console.WriteLine($"Menu Item: {feedback.MenuItemName} - Rating: {feedback.Rating} - Comment: {feedback.Comment}");
+                        Console.WriteLine("| {0, -30} | {1, 6} | {2, -40} ", feedback.MenuItemName, feedback.Rating, feedback.Comment);
                     }
+
+                    Console.WriteLine("-----------------------------------------------------------------------------------");
                 }
                 else
                 {
