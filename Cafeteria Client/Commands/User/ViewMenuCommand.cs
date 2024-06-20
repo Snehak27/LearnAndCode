@@ -23,13 +23,14 @@ namespace CafeteriaClient.Commands
                 {
                     Console.WriteLine("Menu Items:");
                     Console.WriteLine("-----------------------------------------------------------------------------------------");
-                    Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", "ID", "Name", "Price", "AvailabilityStatus");
+                    Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", "Sl No.", "Name", "Price", "AvailabilityStatus");
                     Console.WriteLine("-----------------------------------------------------------------------------------------");
 
                     int serialNumber = 1;
                     foreach (var menuItem in response.MenuItems)
                     {
                         Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, menuItem.AvailabilityStatus);
+                        serialNumber++;
                     }
 
                     Console.WriteLine("-----------------------------------------------------------------------------------------");

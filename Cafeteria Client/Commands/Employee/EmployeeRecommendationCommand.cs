@@ -1,5 +1,6 @@
 ﻿using CafeteriaClient.DTO;
 using CafeteriaClient.DTO.Request;
+using CafeteriaClient.DTO.Response;
 using Newtonsoft.Json;
 using System;
 
@@ -13,6 +14,7 @@ namespace CafeteriaClient.Commands.Employee
         {
             _getUserId = getUserId;
         }
+
         public async Task Execute(ClientSocket clientSocket)
         {
             try
@@ -48,40 +50,63 @@ namespace CafeteriaClient.Commands.Employee
                         Console.WriteLine("----------------------------------------------------------------------------------------------------");
                     }
 
-                    // Prompt the user to vote for menu items
-                    var votes = new List<Vote>();
+                    var orders = new List<OrderRequest>();
 
-                    Console.WriteLine("\nEnter the serial numbers of the menu items to vote for (comma separated):");
-                    string[] itemNumbers = Console.ReadLine().Split(',');
-
-                    foreach (var itemNumber in itemNumbers)
+                    bool isValidInput = false;
+                    while (!isValidInput)
                     {
-                        if (int.TryParse(itemNumber.Trim(), out int serial))
+                        Console.WriteLine("\nEnter the serial numbers of the menu items to vote for (comma separated):");
+                        string input = Console.ReadLine();
+                        if (string.IsNullOrWhiteSpace(input))
                         {
-                            if (menuItemMapping.TryGetValue(serial, out var item))
+                            Console.WriteLine("Input cannot be empty. Please enter valid serial numbers.");
+                            continue;
+                        }
+
+                        string[] itemNumbers = input.Split(',');
+
+                        isValidInput = true;
+                        foreach (var itemNumber in itemNumbers)
+                        {
+                            if (int.TryParse(itemNumber.Trim(), out int serial))
                             {
-                                votes.Add(new Vote
+                                if (menuItemMapping.TryGetValue(serial, out var item))
                                 {
-                                    MenuItemId = item.MenuItemId,
-                                    MealTypeId = item.MealTypeId,
-                                    RecommendedItemId = item.RecommendedItemId
-                                });
+                                    orders.Add(new OrderRequest
+                                    {
+                                        MenuItemId = item.MenuItemId,
+                                        MealTypeId = item.MealTypeId,
+                                        RecommendedItemId = item.RecommendedItemId
+                                    });
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Invalid serial number: {serial}. Please enter valid serial numbers.");
+                                    isValidInput = false;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Invalid input: {itemNumber.Trim()}. Please enter valid numbers.");
+                                isValidInput = false;
+                                break;
                             }
                         }
                     }
+
                     int userId = _getUserId();
 
-                    // Send the votes to the server
-                    var employeeResponseRequest = new EmployeeResponseRequest
+                    var employeeResponseRequest = new EmployeeOrderRequest
                     {
                         UserId = userId,
-                        Votes = votes
+                        OrderList = orders
                     };
 
                     string requestJson = JsonConvert.SerializeObject(employeeResponseRequest);
                     var responseRequest = new RequestObject
                     {
-                        CommandName = "saveEmployeeResponse",
+                        CommandName = "saveEmployeeOrders",
                         RequestData = requestJson
                     };
 
@@ -90,7 +115,7 @@ namespace CafeteriaClient.Commands.Employee
 
                     if (responseResult.IsSuccess)
                     {
-                        Console.WriteLine("Your votes have been successfully recorded.");
+                        Console.WriteLine("Your orders have been successfully recorded.");
                     }
                     else
                     {

@@ -21,7 +21,6 @@ namespace CafeteriaClient.Commands
             {
                 var userId = _getUserId();
 
-                // Request past orders for the last week
                 var requestPastOrders = new RequestObject
                 {
                     CommandName = "getPastOrders",
@@ -46,12 +45,12 @@ namespace CafeteriaClient.Commands
                 }
 
                 Console.WriteLine("Past Orders for the Last Week:");
-                Console.WriteLine("---------------------------------------------------------------");
+                Console.WriteLine("----------------------------------------------------------------------");
                 Console.WriteLine("| {0, -5} | {1, -30} | {2, -20} | {3, -10} |", "Sl No", "Menu Item", "Order Date", "Meal Type");
-                Console.WriteLine("---------------------------------------------------------------");
+                Console.WriteLine("----------------------------------------------------------------------");
 
                 int serialNumber = 1;
-                var orderMapping = new Dictionary<int, PastOrderDTO>();
+                var orderMapping = new Dictionary<int, PastOrderResponse>();
                 foreach (var order in pastOrders)
                 {
                     orderMapping[serialNumber] = order;
@@ -88,7 +87,8 @@ namespace CafeteriaClient.Commands
                     UserId = userId,
                     Comment = feedback,
                     Rating = rating,
-                    MealTypeId = selectedOrder.MealTypeId
+                    MealTypeId = selectedOrder.MealTypeId,
+                    OrderItemId = selectedOrder.OrderItemId,
                 };
 
                 string feedbackRequestJson = JsonConvert.SerializeObject(feedbackRequest);

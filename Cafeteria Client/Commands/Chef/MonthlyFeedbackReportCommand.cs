@@ -1,4 +1,5 @@
 ﻿using CafeteriaClient.DTO;
+using CafeteriaClient.DTO.Response;
 using Newtonsoft.Json;
 using System;
 
@@ -35,22 +36,18 @@ namespace CafeteriaClient.Commands
                 if (response.IsSuccess)
                 {
                     Console.WriteLine($"Feedback Report for {year}-{month:D2}:");
-                    Console.WriteLine("--------------------------------------------------------------------------------");
-                    Console.WriteLine("| {0, -30} | {1, 15} | {2, 15} |", "Menu Item", "Avg Rating", "Feedback Count");
-                    Console.WriteLine("--------------------------------------------------------------------------------");
+                    Console.WriteLine("----------------------------------------------------------------------------------");
+                    Console.WriteLine("| {0, -10} | {1, -30} | {2, 15} | {3, 15} |","Sl No", "Menu Item", "Avg Rating", "Feedback Count");
+                    Console.WriteLine("----------------------------------------------------------------------------------");
 
                     int serialNo = 1;
                     foreach (var summary in response.Report.FeedbackSummaries)
                     {
-                        Console.WriteLine("| {0, -30} | {1, 15:F2} | {2, 15} |", serialNo, summary.MenuItemName, summary.AverageRating, summary.FeedbackCount);
-                        foreach (var comment in summary.Comments)
-                        {
-                            Console.WriteLine($"  - {comment}");
-                        }
+                        Console.WriteLine("| {0, -10} | {1, -30} | {2, 15:F2} | {3, 15} |", serialNo, summary.MenuItemName, summary.AverageRating, summary.FeedbackCount);
                         serialNo++;
                     }
 
-                    Console.WriteLine("--------------------------------------------------------------------------------");
+                    Console.WriteLine("----------------------------------------------------------------------------------");
                 }
                 else
                 {

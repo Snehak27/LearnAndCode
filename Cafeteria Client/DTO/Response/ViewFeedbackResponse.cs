@@ -6,10 +6,10 @@ namespace CafeteriaClient.DTO
     {
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; }
-        public List<FeedbackDTO> Feedbacks { get; set; }
+        public List<FeedbackResponse> Feedbacks { get; set; }
     }
 
-    public class FeedbackDTO
+    public class FeedbackResponse
     {
         public string Comment { get; set; }
         public int Rating { get; set; }

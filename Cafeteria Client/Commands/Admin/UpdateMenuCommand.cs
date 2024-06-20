@@ -23,23 +23,17 @@ namespace CafeteriaClient.Commands.Admin
                 {
                     Console.WriteLine("Menu Items:");
                     Console.WriteLine("-----------------------------------------------------------------------------------");
-                    Console.WriteLine("| {0, -10} | {1, -20}  | {3, 10} | {1, -20} ", "ID", "Name", "Description", "Price", "AvailabilityStatus");
+                    Console.WriteLine("| {0, -10} | {1, -20}  | {2, 10} | {3, -20} ", "ID", "Name", "Price", "AvailabilityStatus");
                     Console.WriteLine("-----------------------------------------------------------------------------------");
 
                     int serialNumber = 1;
                     foreach (var menuItem in response.MenuItems)
                     {
-                        Console.WriteLine("| {0, -10} | {1, -20} | {3, 10} | {1,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, menuItem.AvailabilityStatus);
+                        Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, menuItem.AvailabilityStatus);
                         serialNumber++;
                     }
 
                     Console.WriteLine("-----------------------------------------------------------------------------------");
-                    //Console.WriteLine("Menu Items:");
-                    //for (int i = 0; i < response.MenuItems.Count; i++)
-                    //{
-                    //    var menuItem = response.MenuItems[i];
-                    //    Console.WriteLine($"{i + 1}. Name: {menuItem.ItemName}, Description: {menuItem.Description}, Price: {menuItem.Price}");
-                    //}
                 }
                 else
                 {
@@ -73,9 +67,19 @@ namespace CafeteriaClient.Commands.Admin
                 Console.WriteLine("Enter new availability status (true/false, leave blank to keep current):");
                 string newAvailabilityStatusInput = Console.ReadLine();
                 bool newAvailabilityStatus = menuItemToUpdate.AvailabilityStatus;
-                if (!string.IsNullOrEmpty(newAvailabilityStatusInput) && bool.TryParse(newAvailabilityStatusInput, out bool parsedAvailabilityStatus))
+                if (!string.IsNullOrEmpty(newAvailabilityStatusInput))
                 {
-                    newAvailabilityStatus = parsedAvailabilityStatus;
+                    while (!bool.TryParse(newAvailabilityStatusInput, out newAvailabilityStatus))
+                    {
+                        Console.WriteLine("Invalid input. Please enter 'true' or 'false' for the availability status, or leave blank to keep current:");
+                        newAvailabilityStatusInput = Console.ReadLine();
+
+                        if (string.IsNullOrEmpty(newAvailabilityStatusInput))
+                        {
+                            newAvailabilityStatus = menuItemToUpdate.AvailabilityStatus;
+                            break;
+                        }
+                    }
                 }
 
                 var updateMenuItemRequest = new MenuItem

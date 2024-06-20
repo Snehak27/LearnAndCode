@@ -8,18 +8,41 @@ namespace CafeteriaClient.Commands
     {
         public async Task Execute(ClientSocket clientSocket)
         {
-            Console.WriteLine("Enter menu item name:");
-            string itemName = Console.ReadLine();
-
-            Console.WriteLine("Enter price:");
-            double price = Convert.ToDouble(Console.ReadLine());
-
-            Console.WriteLine("Enter availability status (true/false):");
-            string availabilityStatusInput = Console.ReadLine();
-            bool availabilityStatus = false;
-            if (!string.IsNullOrEmpty(availabilityStatusInput) && bool.TryParse(availabilityStatusInput, out bool parsedAvailabilityStatus))
+            string itemName;
+            do
             {
-                availabilityStatus = parsedAvailabilityStatus;
+                Console.WriteLine("Enter menu item name (cannot be blank):");
+                itemName = Console.ReadLine();
+            } while (string.IsNullOrEmpty(itemName));
+
+            double price;
+            while (true)
+            {
+                Console.WriteLine("Enter price:");
+                string priceInput = Console.ReadLine();
+                if (!string.IsNullOrEmpty(priceInput) && double.TryParse(priceInput, out price) && price > 0)
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid price.");
+                }
+            }
+
+            bool availabilityStatus = false;
+            while (true)
+            {
+                Console.WriteLine("Enter availability status (true/false, leave blank to default to false):");
+                string availabilityStatusInput = Console.ReadLine();
+                if (string.IsNullOrEmpty(availabilityStatusInput) || bool.TryParse(availabilityStatusInput, out availabilityStatus))
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter 'true' or 'false'.");
+                }
             }
 
             var menuItem= new MenuItemRequest

@@ -16,7 +16,7 @@ public class Program
     {
         while (true)
         {
-            var clientSocket = new ClientSocket("192.168.4.224", port);
+            var clientSocket = new ClientSocket("192.168.43.81", port);
             var _dispatcher = new CommandDispatcher();
 
             _dispatcher.RegisterCommand("login", new LoginCommand(async (id, roleId) =>
@@ -55,7 +55,7 @@ public class Program
                 dispatcher.RegisterCommand("2", new ViewFeedbackCommand());
                 dispatcher.RegisterCommand("3", new MonthlyFeedbackReportCommand());
                 dispatcher.RegisterCommand("4", new RolloutMenuCommand());
-                dispatcher.RegisterCommand("5", new ViewEmployeeResponseCommand());
+                dispatcher.RegisterCommand("5", new ViewEmployeeOrdersCommand());
 
                 break;
 
@@ -114,7 +114,7 @@ public class Program
                 Console.WriteLine("2) View Employee Feedback");
                 Console.WriteLine("3) View Monthly Feedback report");
                 Console.WriteLine("4) Roll out menu for next day");
-                Console.WriteLine("5) View Employee Response");
+                Console.WriteLine("5) View Employee Orders");
                 Console.WriteLine("6) Logout");
                 break;
 
@@ -122,7 +122,7 @@ public class Program
                 Console.WriteLine("\nEmployee operations");
                 Console.WriteLine("1) View Menu");
                 Console.WriteLine("2) Give Feedback");
-                Console.WriteLine("3) View Recommendations for next day");
+                Console.WriteLine("3) View Recommendations for next day and order");
                 Console.WriteLine("4) Logout");
                 break;
 

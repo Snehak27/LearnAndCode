@@ -9,11 +9,13 @@ namespace CafeteriaClient.DTO.Request
         public int Rating { get; set; }
         public string Comment { get; set; }
         public int MealTypeId { get; set; }
+        public int OrderItemId { get; set; }
     }
-    public class PastOrderDTO
+    public class PastOrderResponse
     {
         public int OrderId { get; set; }
         public int MenuItemId { get; set; }
+        public int OrderItemId { get; set; }
         public string MenuItemName { get; set; }
         public DateTime OrderDate { get; set; }
         public int MealTypeId { get; set; }
@@ -23,6 +25,6 @@ namespace CafeteriaClient.DTO.Request
     {
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; }
-        public List<PastOrderDTO> PastOrders { get; set; }
+        public List<PastOrderResponse> PastOrders { get; set; }
     }
 }
