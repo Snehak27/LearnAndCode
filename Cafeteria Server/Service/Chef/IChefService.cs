@@ -5,10 +5,10 @@ namespace CafeteriaServer.Service
 {
     public interface IChefService
     {
-        Task<List<FeedbackDTO>> GetAllFeedbacks();
-        Task<MonthlyFeedbackReportResponse> GetMonthlyFeedbackReportAsync(MonthlyFeedbackReportRequest request);
-        Task<List<EmployeeResponseSummary>> GetEmployeeResponses();
-        Task SaveFinalMenuAsync(List<MealTypeMenuItem> mealTypeMenuItems);
+        Task<List<FeedbackResponse>> GetAllFeedbacks();
+        Task<MonthlyFeedbackReportResponse> GetMonthlyFeedbackReport(MonthlyFeedbackReportRequest request);
+        Task<List<EmployeeOrderSummary>> GetEmployeeOrders();
+        Task SaveFinalMenu(List<MealTypeMenuItemList> mealTypeMenuItems);
         Task<List<MealTypeRecommendations>> GetRecommendations();
     }
 }

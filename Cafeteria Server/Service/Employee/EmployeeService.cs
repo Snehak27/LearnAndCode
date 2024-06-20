@@ -19,12 +19,13 @@ namespace CafeteriaServer.Service
         {
             var feedback = new Feedback
             {
-                MenuItemId = feedbackRequest.MenuItemId,
+                //MenuItemId = feedbackRequest.MenuItemId,
                 UserId = feedbackRequest.UserId,
                 Comment = feedbackRequest.Comment,
                 Rating = feedbackRequest.Rating,
-                FeedbackDate = DateTime.UtcNow,
-                MealTypeId = feedbackRequest.MealTypeId,
+                FeedbackDate = DateTime.Now,
+                OrderItemId = feedbackRequest.OrderItemId,
+                //MealTypeId = feedbackRequest.MealTypeId,
             };
 
             await _unitOfWork.Feedbacks.Add(feedback);
@@ -38,7 +39,7 @@ namespace CafeteriaServer.Service
             try
             {
                 var mealTypes = await _unitOfWork.MealTypes.GetAll();
-                var today = DateTime.UtcNow.Date;
+                var today = DateTime.Now.Date;
                 var recommendations = (await _unitOfWork.Recommendations
                     .FindAll(r => r.RecommendationDate.Date == today))
                     .ToList();
@@ -69,17 +70,17 @@ namespace CafeteriaServer.Service
 
                     var items = recommendedItems
                         .Where(ri => ri.RecommendationId == mealTypeRecommendation.RecommendationId)
-                        .Select(ri => new RecommendedItemDTO
+                        .Select(ri => new RecommendedItemResponse
                         {
                             MenuItemId = ri.MenuItemId,
                             MenuItemName = ri.MenuItem.ItemName,
-                            PredictedRating = 0, // Replace with actual logic if available
-                            Comments = new List<string>(), // Replace with actual logic if available
-                            OverallSentiment = string.Empty // Placeholder for sentiment
+                            PredictedRating = 0,
+                            Comments = new List<string>(),
+                            OverallSentiment = string.Empty,
+                            RecommendedItemId = ri.RecommendedItemId
                         })
                         .ToList();
 
-                    // Update PredictedRating, Comments, and OverallSentiment
                     foreach (var item in items)
                     {
                         var updatedItem = updatedItems
@@ -117,55 +118,77 @@ namespace CafeteriaServer.Service
             }
         }
 
-        public async Task SaveEmployeeResponse(EmployeeResponseRequest employeeResponseRequest)
+        public async Task SaveEmployeeOrder(EmployeeOderRequest employeeOrderRequest)
         {
-            var employeeResponse = new Order
+            var employeeOrder = new Order
             {
-                UserId = employeeResponseRequest.UserId,
-                OrderDate = DateTime.UtcNow
+                UserId = employeeOrderRequest.UserId,
+                OrderDate = DateTime.Now
             };
 
-            await _unitOfWork.Orders.Add(employeeResponse);
+            await _unitOfWork.Orders.Add(employeeOrder);
             _unitOfWork.Save();
 
-            foreach (var vote in employeeResponseRequest.Votes)
+            foreach (var vote in employeeOrderRequest.OrderList)
             {
                 var recommendedItem = await _unitOfWork.RecommendedItems.GetById(vote.RecommendedItemId);
 
                 if (recommendedItem != null)
                 {
-                    var employeeResponseItem = new OrderItem
+                    var employeeOrderItem = new OrderItem
                     {
-                        OrderId = employeeResponse.OrderId,
+                        OrderId = employeeOrder.OrderId,
                         RecommendedItemId = recommendedItem.RecommendedItemId
                     };
-                    await _unitOfWork.OrderItems.Add(employeeResponseItem);
+                    await _unitOfWork.OrderItems.Add(employeeOrderItem);
                 }
             }
 
             _unitOfWork.Save();
         }
 
-        public async Task<List<PastOrderDTO>> GetPastOrders(int userId)
+        public async Task<List<PastOrderResponse>> GetPastOrders(int userId)
         {
-            var oneWeekAgo = DateTime.UtcNow.AddDays(-3);
+            var daysLimit = DateTime.Now.AddDays(-3);
 
-            // Retrieve the past orders from the last week for the specified user
             var pastOrdersRaw = (await _unitOfWork.OrderItems
-                .FindAll(eri => eri.Order.UserId == userId && eri.Order.OrderDate >= oneWeekAgo))
+                .FindAll(eri => eri.Order.UserId == userId && eri.Order.OrderDate >= daysLimit))
                 .ToList();
 
-            // Project the retrieved data into PastOrderDTO objects
-            var pastOrders = pastOrdersRaw.Select(eri => new PastOrderDTO
-            {
-                OrderId = eri.OrderId,
-                MenuItemId = eri.RecommendedItem.MenuItemId,
-                MenuItemName = eri.RecommendedItem.MenuItem.ItemName,
-                OrderDate = eri.Order.OrderDate,
-                MealTypeId = eri.RecommendedItem.Recommendation.MealTypeId
-            }).ToList();
+            var feedbacks = await _unitOfWork.Feedbacks.FindAll(f => f.UserId == userId);
+
+            var pastOrders = pastOrdersRaw
+                .Where(eri => !feedbacks.Any(f => f.OrderItemId == eri.OrderItemId))
+                .Select(eri => new PastOrderResponse
+                {
+                    OrderId = eri.OrderId,
+                    MenuItemId = eri.RecommendedItem.MenuItemId,
+                    MenuItemName = eri.RecommendedItem.MenuItem.ItemName,
+                    OrderDate = eri.Order.OrderDate,
+                    MealTypeId = eri.RecommendedItem.Recommendation.MealTypeId,
+                    OrderItemId = eri.OrderItemId
+                })
+                .ToList();
 
             return pastOrders;
         }
+        //var daysLimit = DateTime.Now.AddDays(-3);
+
+        //var pastOrdersRaw = (await _unitOfWork.OrderItems
+        //    .FindAll(eri => eri.Order.UserId == userId && eri.Order.OrderDate >= daysLimit))
+        //    .ToList();
+
+        //var pastOrders = pastOrdersRaw.Select(eri => new PastOrderResponse
+        //{
+        //    OrderId = eri.OrderId,
+        //    MenuItemId = eri.RecommendedItem.MenuItemId,
+        //    MenuItemName = eri.RecommendedItem.MenuItem.ItemName,
+        //    OrderDate = eri.Order.OrderDate,
+        //    MealTypeId = eri.RecommendedItem.Recommendation.MealTypeId,
+        //    OrderItemId = eri.OrderItemId
+        //}).ToList();
+
+        //return pastOrders;
     }
 }
+

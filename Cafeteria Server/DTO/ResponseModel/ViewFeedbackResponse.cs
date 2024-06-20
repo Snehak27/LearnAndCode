@@ -7,6 +7,6 @@ namespace CafeteriaServer.DTO
     {
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; }
-        public List<FeedbackDTO> Feedbacks { get; set; }
+        public List<FeedbackResponse> Feedbacks { get; set; }
     }
 }

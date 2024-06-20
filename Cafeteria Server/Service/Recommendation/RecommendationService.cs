@@ -8,13 +8,14 @@ namespace CafeteriaServer.Service
     public class RecommendationService : IRecommendationService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly SentimentAnalyzer _sentimentAnalyzer;
+        private readonly ISentimentAnalyzer _sentimentAnalyzer;
 
-        public RecommendationService(IUnitOfWork unitOfWork)
+        public RecommendationService(IUnitOfWork unitOfWork, ISentimentAnalyzer sentimentAnalyzer)
         {
             _unitOfWork = unitOfWork;
-            _sentimentAnalyzer = new SentimentAnalyzer();
+            _sentimentAnalyzer = sentimentAnalyzer;
         }
+
         public async Task<List<MealTypeRecommendations>> GetRecommendations()
         {
             var mealTypes = await _unitOfWork.MealTypes.GetAll();
@@ -24,14 +25,14 @@ namespace CafeteriaServer.Service
 
             foreach (var mealType in mealTypes)
             {
-                var feedbacks = allFeedbacks.Where(f => f.MealTypeId == mealType.MealTypeId).ToList();
+                var feedbacks = allFeedbacks.Where(f => f.OrderItem.RecommendedItem.Recommendation.MealTypeId == mealType.MealTypeId).ToList();
 
                 var feedbackWithSentiments = feedbacks.Select(f => new
                 {
-                    f.MenuItemId,
+                    f.OrderItem.RecommendedItem.MenuItemId,
                     f.Rating,
                     SentimentScore = _sentimentAnalyzer.AnalyzeSentiment(f.Comment),
-                    f.MenuItem.ItemName,
+                    f.OrderItem.RecommendedItem.MenuItem.ItemName,
                     f.Comment,
                     f.FeedbackDate
                 }).ToList();
@@ -45,7 +46,8 @@ namespace CafeteriaServer.Service
                         MenuItemName = g.First().ItemName,
                         VoteCount = g.Count(),
                         AverageRating = g.Average(f => f.Rating),
-                        OverallSentiment = _sentimentAnalyzer.GetSentimentLabel(g.Average(f => f.SentimentScore)),
+                        AverageSentimentScore = g.Average(f => f.SentimentScore),
+                        //OverallSentiment = _sentimentAnalyzer.GetSentimentLabel(g.Average(f => f.SentimentScore)),
                         Comments = g.OrderByDescending(c => c.FeedbackDate)
                                     .Take(2)
                                     .Concat(g.OrderByDescending(c => Math.Abs(c.SentimentScore)).Take(1))
@@ -57,7 +59,7 @@ namespace CafeteriaServer.Service
                     .ToList();
 
                 var recommendations = combinedScores
-                    .Select(x => new RecommendedItemDTO
+                    .Select(x => new RecommendedItemResponse
                     {
                         MenuItemId = x.MenuItemId,
                         MenuItemName = x.MenuItemName,
@@ -65,7 +67,7 @@ namespace CafeteriaServer.Service
                         Comments = x.Comments,
                         VoteCount = x.VoteCount,
                         AverageRating = x.AverageRating,
-                        OverallSentiment = x.OverallSentiment
+                        OverallSentiment = _sentimentAnalyzer.GetSentimentLabel(x.AverageSentimentScore)
                     })
                     .ToList();
 

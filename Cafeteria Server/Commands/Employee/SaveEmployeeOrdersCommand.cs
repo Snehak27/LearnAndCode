@@ -5,13 +5,13 @@ using System;
 
 namespace CafeteriaServer.Commands
 {
-    public class SaveFinalMenuCommand : ICommand
+    public class SaveEmployeeOrdersCommand : ICommand
     {
-        private readonly IChefService _chefService;
+        private readonly IEmployeeService _employeeService;
 
-        public SaveFinalMenuCommand(IChefService chefService)
+        public SaveEmployeeOrdersCommand(IEmployeeService employeeService)
         {
-            _chefService = chefService;
+            _employeeService = employeeService;
         }
 
         public async Task<string> Execute(string requestData)
@@ -20,8 +20,8 @@ namespace CafeteriaServer.Commands
 
             try
             {
-                var request = JsonConvert.DeserializeObject<SaveFinalMenuRequest>(requestData);
-                await _chefService.SaveFinalMenu(request.MealTypeMenuItems);
+                var employeeResponseRequest = JsonConvert.DeserializeObject<EmployeeOderRequest>(requestData);
+                await _employeeService.SaveEmployeeOrder(employeeResponseRequest);
                 response.IsSuccess = true;
             }
             catch (Exception ex)

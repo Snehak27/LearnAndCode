@@ -5,24 +5,24 @@ using System;
 
 namespace CafeteriaServer.Commands
 {
-    public class SaveFinalMenuCommand : ICommand
+    public class ChefRecommendationCommand : ICommand
     {
         private readonly IChefService _chefService;
 
-        public SaveFinalMenuCommand(IChefService chefService)
+        public ChefRecommendationCommand(IChefService chefService)
         {
             _chefService = chefService;
         }
 
         public async Task<string> Execute(string requestData)
         {
-            var response = new ResponseMessage();
+            var response = new RecommendationResponse();
 
             try
             {
-                var request = JsonConvert.DeserializeObject<SaveFinalMenuRequest>(requestData);
-                await _chefService.SaveFinalMenu(request.MealTypeMenuItems);
+                var mealTypeRecommendations = await _chefService.GetRecommendations();
                 response.IsSuccess = true;
+                response.MealTypeRecommendations = mealTypeRecommendations;
             }
             catch (Exception ex)
             {

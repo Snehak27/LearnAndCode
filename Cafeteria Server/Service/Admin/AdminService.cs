@@ -26,7 +26,6 @@ namespace CafeteriaServer.Service
             await _unitOfWork.MenuItems.Add(item);
             _unitOfWork.Save();
 
-            // Create notifications for all employees
             var employees = await _unitOfWork.Users.FindAll(u => u.RoleId == 3); 
             foreach (var employee in employees)
             {
@@ -66,21 +65,23 @@ namespace CafeteriaServer.Service
             _unitOfWork.MenuItems.Update(item);
             _unitOfWork.Save();
 
-            // Create notifications for all employees
-            var employees = await _unitOfWork.Users.FindAll(u => u.RoleId == 3);
-            foreach (var employee in employees)
+            if(notify)
             {
-                var notification = new UserNotification
+                var employees = await _unitOfWork.Users.FindAll(u => u.RoleId == 3);
+                foreach (var employee in employees)
                 {
-                    UserId = employee.UserId,
-                    NotificationTypeId = 2, 
-                    MenuItemId = item.MenuItemId,
-                    IsRead = false,
-                    CreatedAt = DateTime.Now
-                };
-                await _unitOfWork.UserNotifications.Add(notification);
+                    var notification = new UserNotification
+                    {
+                        UserId = employee.UserId,
+                        NotificationTypeId = 2,
+                        MenuItemId = item.MenuItemId,
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    };
+                    await _unitOfWork.UserNotifications.Add(notification);
+                }
+                _unitOfWork.Save();
             }
-            _unitOfWork.Save();
 
             return true;
         }

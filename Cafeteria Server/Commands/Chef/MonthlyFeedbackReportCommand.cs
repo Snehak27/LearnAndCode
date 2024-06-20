@@ -21,7 +21,7 @@ namespace CafeteriaServer.Commands
 
             try
             {
-                var report = await _chefService.GetMonthlyFeedbackReportAsync(request);
+                var report = await _chefService.GetMonthlyFeedbackReport(request);
                 response.IsSuccess = true;
                 response.Report = report.Report;
             }

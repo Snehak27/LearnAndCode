@@ -16,31 +16,31 @@ namespace CafeteriaServer.Service
             _recommendationService = recommendationService;
         }
 
-        public async Task<List<FeedbackDTO>> GetAllFeedbacks()
+        public async Task<List<FeedbackResponse>> GetAllFeedbacks()
         {
             var feedbacks = await _unitOfWork.Feedbacks.GetAll();
-            var feedbackDTOs = new List<FeedbackDTO>();
+            var feedbacksResponse = new List<FeedbackResponse>();
 
             foreach (var feedback in feedbacks)
             {
-                feedbackDTOs.Add(new FeedbackDTO
+                feedbacksResponse.Add(new FeedbackResponse
                 {
                     Comment = feedback.Comment,
                     Rating = feedback.Rating,
-                    MenuItemName = feedback.MenuItem.ItemName
+                    MenuItemName = feedback.OrderItem.RecommendedItem.MenuItem.ItemName
                 });
             }
 
-            return feedbackDTOs;
+            return feedbacksResponse;
         }
 
-        public async Task<MonthlyFeedbackReportResponse> GetMonthlyFeedbackReportAsync(MonthlyFeedbackReportRequest request)
+        public async Task<MonthlyFeedbackReportResponse> GetMonthlyFeedbackReport(MonthlyFeedbackReportRequest request)
         {
             var feedbacks = await _unitOfWork.Feedbacks.GetAll();
 
             var monthlyFeedbacks = feedbacks
                 .Where(f => f.FeedbackDate.Year == request.Year && f.FeedbackDate.Month == request.Month)
-                .GroupBy(f => f.MenuItem.ItemName)
+                .GroupBy(f => f.OrderItem.RecommendedItem.MenuItem.ItemName)
                 .Select(g => new FeedbackSummary
                 {
                     MenuItemName = g.Key,
@@ -64,7 +64,7 @@ namespace CafeteriaServer.Service
             };
         }
 
-        public async Task<List<EmployeeResponseSummary>> GetEmployeeResponses()
+        public async Task<List<EmployeeOrderSummary>> GetEmployeeOrders()
         {
             var mealTypes = await _unitOfWork.MealTypes.GetAll();
             var orderItems = await _unitOfWork.OrderItems.GetAll();
@@ -81,81 +81,56 @@ namespace CafeteriaServer.Service
                 .FindAll(ri => recommendationIds.Contains(ri.RecommendationId)))
                 .ToList();
 
-            var employeeResponseSummaries = new List<EmployeeResponseSummary>();
+            var employeeResponseSummaries = new List<EmployeeOrderSummary>();
 
             foreach (var mealType in mealTypes)
             {
-                var votes = orderItems
+                var orders = orderItems
                     .Where(eri => recommendedItems.Any(ri => ri.RecommendedItemId == eri.RecommendedItemId && ri.Recommendation.MealTypeId == mealType.MealTypeId))
                     .GroupBy(eri => eri.RecommendedItem.MenuItemId)
-                    .Select(g => new MenuItemVote
+                    .Select(g => new MenuItemOrder
                     {
                         MenuItemId = g.Key,
                         MenuItemName = g.First().RecommendedItem.MenuItem.ItemName,
-                        VoteCount = g.Count()
+                        OrderCount = g.Count()
                     })
-                    .OrderByDescending(miv => miv.VoteCount)
+                    .OrderByDescending(miv => miv.OrderCount)
                     .ToList();
 
-                employeeResponseSummaries.Add(new EmployeeResponseSummary
+                employeeResponseSummaries.Add(new EmployeeOrderSummary
                 {
                     MealTypeId = mealType.MealTypeId,
                     MealTypeName = mealType.MealTypeName,
-                    MenuItemVotes = votes
+                    MenuItemOrders = orders
                 });
             }
 
             return employeeResponseSummaries;
         }
 
-        //public async Task<List<MealTypeRecommendations>> GetRecommendations()
-        //{
-        //    var allRecommendations = await _recommendationService.GetRecommendations();
-        //    var topRecommendations = new List<MealTypeRecommendations>();
-
-        //    foreach (var mealTypeRecommendation in allRecommendations)
-        //    {
-        //        var topMealTypeRecommendation = new MealTypeRecommendations
-        //        {
-        //            MealTypeId = mealTypeRecommendation.MealTypeId,
-        //            Recommendations = mealTypeRecommendation.Recommendations
-        //                .OrderByDescending(r => r.PredictedRating)
-        //                .Take(3)
-        //                .ToList()
-        //        };
-        //        topRecommendations.Add(topMealTypeRecommendation);
-        //    }
-        //    return topRecommendations;
-        //    //var mealTypeRecommendations = await _recommendationService.GetRecommendations();
-
-        //    //return mealTypeRecommendations;
-        //}
         public async Task<List<MealTypeRecommendations>> GetRecommendations()
         {
-            // Fetch all recommendations
             var allRecommendations = await _recommendationService.GetRecommendations();
             var topRecommendations = new List<MealTypeRecommendations>();
 
             foreach (var mealTypeRecommendation in allRecommendations)
             {
-                // Create a new MealTypeRecommendations object for each meal type
                 var topMealTypeRecommendation = new MealTypeRecommendations
                 {
                     MealTypeId = mealTypeRecommendation.MealTypeId,
                     Recommendations = mealTypeRecommendation.Recommendations
                         .OrderByDescending(r => r.PredictedRating)
-                        .Take(3) // Take the top 3 recommendations
+                        .Take(3) 
                         .ToList()
                 };
 
-                // Add to the topRecommendations list
                 topRecommendations.Add(topMealTypeRecommendation);
             }
 
-            // Return the top recommendations
             return topRecommendations;
         }
-        public async Task SaveFinalMenuAsync(List<MealTypeMenuItem> mealTypeMenuItems)
+
+        public async Task SaveFinalMenu(List<MealTypeMenuItemList> mealTypeMenuItems)
         {
             foreach (var mealTypeMenuItem in mealTypeMenuItems)
             {
@@ -181,7 +156,6 @@ namespace CafeteriaServer.Service
             }
             _unitOfWork.Save();
 
-            // Add notifications for all users
             var users = await _unitOfWork.Users.FindAll(u => u.RoleId == 3);
             foreach (var user in users)
             {

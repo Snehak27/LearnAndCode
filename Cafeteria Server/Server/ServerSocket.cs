@@ -23,7 +23,7 @@ namespace CafeteriaServer.Server
         {
             try
             {
-                listener = new TcpListener(IPAddress.Parse("192.168.4.224"), port);
+                listener = new TcpListener(IPAddress.Parse("192.168.43.81"), port);
                 listener.Start();
                 Console.WriteLine($"Server started. Listening on port {port}...");
 

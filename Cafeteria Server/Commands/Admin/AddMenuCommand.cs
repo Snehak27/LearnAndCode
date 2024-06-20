@@ -31,6 +31,5 @@ namespace CafeteriaServer.Commands.Admin
 
             return JsonConvert.SerializeObject(responseMessage);
         }
-           
     }
 }

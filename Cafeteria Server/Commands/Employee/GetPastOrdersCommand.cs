@@ -21,7 +21,7 @@ namespace CafeteriaServer.Commands
                 var pastOrderRequest = JsonConvert.DeserializeObject<PastOrderRequest>(requestData);
                 var pastOrders = await _employeeService.GetPastOrders(pastOrderRequest.UserId);
 
-                return JsonConvert.SerializeObject(new PastOrderResponse
+                return JsonConvert.SerializeObject(new PastOrdersResponse
                 {
                     IsSuccess = true,
                     PastOrders = pastOrders
@@ -29,7 +29,7 @@ namespace CafeteriaServer.Commands
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new PastOrderResponse
+                return JsonConvert.SerializeObject(new PastOrdersResponse
                 {
                     IsSuccess = false,
                     ErrorMessage = ex.Message

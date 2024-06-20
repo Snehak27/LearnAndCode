@@ -3,7 +3,7 @@ using System;
 
 namespace CafeteriaServer.Service
 {
-    public class SentimentAnalyzer
+    public class SentimentAnalyzer : ISentimentAnalyzer
     {
         private readonly Dictionary<string, int> _sentimentLexicon;
 
