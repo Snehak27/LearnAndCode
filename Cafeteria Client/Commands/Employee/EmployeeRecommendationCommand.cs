@@ -30,25 +30,28 @@ namespace CafeteriaClient.Commands.Employee
 
                 if (response.IsSuccess)
                 {
-                    Console.WriteLine("Recommendations:");
-                    int serialNo = 1;
-                    var menuItemMapping = new Dictionary<int, (int MenuItemId, int MealTypeId, int RecommendedItemId)>();
+                    var menuItemMapping = DisplayRecommendations(response);
+                    //var orders = GetOrdersFromUser(menuItemMapping);
 
-                    foreach (var mealTypeRecommendation in response.MealTypeRecommendations)
-                    {
-                        Console.WriteLine($"\n{mealTypeRecommendation.MealTypeName}:");
-                        Console.WriteLine("-----------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("| {0, -10} | {1, -30} | {2, 20} |{3, -20} |{4, -20}", "Sl No.", "Name", "Overall Rating", "Comments", "Sentiment");
-                        Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+                    //Console.WriteLine("Recommendations:");
+                    //int serialNo = 1;
+                    //var menuItemMapping = new Dictionary<int, (int MenuItemId, int MealTypeId, int RecommendedItemId)>();
 
-                        foreach (var recommendedItem in mealTypeRecommendation.RecommendedItems)
-                        {
-                            Console.WriteLine("| {0, -10} | {1, -30} | {2, 20:F2} | {3, -20} | {4, -20} ", serialNo, recommendedItem.MenuItemName, recommendedItem.PredictedRating, string.Join(", ", recommendedItem.Comments), recommendedItem.OverallSentiment);
-                            menuItemMapping[serialNo] = (recommendedItem.MenuItemId, mealTypeRecommendation.MealTypeId, recommendedItem.RecommendedItemId);
-                            serialNo++;
-                        }
-                        Console.WriteLine("----------------------------------------------------------------------------------------------------");
-                    }
+                    //foreach (var mealTypeRecommendation in response.MealTypeRecommendations)
+                    //{
+                    //    Console.WriteLine($"\n{mealTypeRecommendation.MealTypeName}:");
+                    //    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+                    //    Console.WriteLine("| {0, -10} | {1, -30} | {2, 20} |{3, -20} |{4, -20}", "Sl No.", "Name", "Overall Rating", "Comments", "Sentiment");
+                    //    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+
+                    //    foreach (var recommendedItem in mealTypeRecommendation.RecommendedItems)
+                    //    {
+                    //        Console.WriteLine("| {0, -10} | {1, -30} | {2, 20:F2} | {3, -20} | {4, -20} ", serialNo, recommendedItem.MenuItemName, recommendedItem.PredictedRating, string.Join(", ", recommendedItem.Comments), recommendedItem.OverallSentiment);
+                    //        menuItemMapping[serialNo] = (recommendedItem.MenuItemId, mealTypeRecommendation.MealTypeId, recommendedItem.RecommendedItemId);
+                    //        serialNo++;
+                    //    }
+                    //    Console.WriteLine("----------------------------------------------------------------------------------------------------");
+                    //}
 
                     var orders = new List<OrderRequest>();
 
@@ -131,6 +134,31 @@ namespace CafeteriaClient.Commands.Employee
             {
                 Console.WriteLine("Error: " + ex.Message);
             }
+        }
+
+        private Dictionary<int, (int MenuItemId, int MealTypeId, int RecommendedItemId)> DisplayRecommendations(EmployeeRecommendationResponse response)
+        {
+            Console.WriteLine("Recommendations:");
+            int serialNo = 1;
+            var menuItemMapping = new Dictionary<int, (int MenuItemId, int MealTypeId, int RecommendedItemId)>();
+
+            foreach (var mealTypeRecommendation in response.MealTypeRecommendations)
+            {
+                Console.WriteLine($"\n{mealTypeRecommendation.MealTypeName}:");
+                Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+                Console.WriteLine("| {0, -10} | {1, -30} | {2, 20} |{3, -20} |{4, -20}", "Sl No.", "Name", "Overall Rating", "Comments", "Sentiment");
+                Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+
+                foreach (var recommendedItem in mealTypeRecommendation.RecommendedItems)
+                {
+                    Console.WriteLine("| {0, -10} | {1, -30} | {2, 20:F2} | {3, -20} | {4, -20} ", serialNo, recommendedItem.MenuItemName, recommendedItem.PredictedRating, string.Join(", ", recommendedItem.Comments), recommendedItem.OverallSentiment);
+                    menuItemMapping[serialNo] = (recommendedItem.MenuItemId, mealTypeRecommendation.MealTypeId, recommendedItem.RecommendedItemId);
+                    serialNo++;
+                }
+                Console.WriteLine("----------------------------------------------------------------------------------------------------");
+            }
+
+            return menuItemMapping;
         }
     }
 }

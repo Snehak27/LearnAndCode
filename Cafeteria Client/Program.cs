@@ -16,17 +16,17 @@ public class Program
     {
         while (true)
         {
-            var clientSocket = new ClientSocket("192.168.43.81", port);
+            var clientSocket = new ClientSocket("192.168.236.36", port);
             var _dispatcher = new CommandDispatcher();
 
             _dispatcher.RegisterCommand("login", new LoginCommand(async (id, roleId) =>
             {
                 userId = id;
                 userRoleId = roleId;
-                await DisplayMenu(userRoleId, _dispatcher, clientSocket);
+                await DisplayOperations(userRoleId, _dispatcher, clientSocket);
             }));
 
-            _dispatcher.RegisterCommand("logout", new LogoutCommand(ClearUserId));
+            _dispatcher.RegisterCommand("logout", new LogoutCommand(ClearUserId, () => userId));
 
             await _dispatcher.Dispatch("login", clientSocket);
         }
@@ -37,7 +37,7 @@ public class Program
         userId = 0;
     }
 
-    static async Task DisplayMenu(int roleId, CommandDispatcher dispatcher, ClientSocket clientSocket)
+    static async Task DisplayOperations(int roleId, CommandDispatcher dispatcher, ClientSocket clientSocket)
     {
         switch (roleId)
         {
@@ -53,7 +53,7 @@ public class Program
                 //Register chef commands;
                 dispatcher.RegisterCommand("1", new ViewMenuCommand());
                 dispatcher.RegisterCommand("2", new ViewFeedbackCommand());
-                dispatcher.RegisterCommand("3", new MonthlyFeedbackReportCommand());
+                dispatcher.RegisterCommand("3", new ViewMonthlyFeedbackReportCommand());
                 dispatcher.RegisterCommand("4", new RolloutMenuCommand());
                 dispatcher.RegisterCommand("5", new ViewEmployeeOrdersCommand());
 
@@ -62,7 +62,7 @@ public class Program
             case 3:
                 //Register employee commands
                 dispatcher.RegisterCommand("1", new ViewMenuCommand());
-                dispatcher.RegisterCommand("2", new FeedbackCommand(() => userId));
+                dispatcher.RegisterCommand("2", new SumitFeedbackCommand(() => userId));
                 dispatcher.RegisterCommand("3", new ViewEmployeeRecommendationsCommand(() => userId));
                 break;
 
@@ -74,7 +74,7 @@ public class Program
         bool exit = false;
         while (!exit)
         {
-            DisplayRoleMenu(roleId);
+            DisplayRoleOperations(roleId);
 
             Console.WriteLine("Enter command: ");
             string commandKey = Console.ReadLine();
@@ -95,7 +95,7 @@ public class Program
         }
     }
 
-    static void DisplayRoleMenu(int roleId)
+    static void DisplayRoleOperations(int roleId)
     {
         switch (roleId)
         {

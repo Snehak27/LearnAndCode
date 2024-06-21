@@ -12,7 +12,7 @@ namespace CafeteriaClient.Commands.Chef
             {
                 var request = new RequestObject
                 {
-                    CommandName = "viewFeedback",
+                    CommandName = "getFeedbacks",
                     RequestData = string.Empty
                 };
 

@@ -13,7 +13,7 @@ namespace CafeteriaClient.Commands
             {
                 var request = new RequestObject
                 {
-                    CommandName = "viewEmployeeOrders",
+                    CommandName = "getEmployeeOrders",
                     RequestData = string.Empty
                 };
 

@@ -9,7 +9,7 @@ namespace CafeteriaClient.Commands.Admin
         public async Task Execute(ClientSocket clientSocket)
         {
             var request = new RequestObject();
-            request.CommandName = "viewMenu";
+            request.CommandName = "getAllMenuItems";
             request.RequestData = string.Empty;
 
             string responseJson = await clientSocket.SendRequest(request);

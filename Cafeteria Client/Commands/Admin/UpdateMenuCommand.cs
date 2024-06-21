@@ -12,7 +12,7 @@ namespace CafeteriaClient.Commands.Admin
             {
                 var request = new RequestObject
                 {
-                    CommandName = "viewMenu",
+                    CommandName = "getAllMenuItems",
                     RequestData = string.Empty
                 };
 
