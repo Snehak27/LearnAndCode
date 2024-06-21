@@ -10,5 +10,6 @@ namespace CafeteriaServer.DAL.Models
         public string ItemName { get; set; }
         public double Price { get; set; }
         public bool AvailabilityStatus { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

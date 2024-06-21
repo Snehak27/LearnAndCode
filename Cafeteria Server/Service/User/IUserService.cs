@@ -8,5 +8,6 @@ namespace CafeteriaServer.Service
     {
         Task<AuthenticationResponse> AuthenticateUser(AuthenticationRequest authenticationRequest);
         Task<IEnumerable<MenuItem>> GetAllMenuItems();
+        Task<User> GetUserById(int userId);
     }
 }

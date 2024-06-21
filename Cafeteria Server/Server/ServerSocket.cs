@@ -23,7 +23,7 @@ namespace CafeteriaServer.Server
         {
             try
             {
-                listener = new TcpListener(IPAddress.Parse("192.168.43.81"), port);
+                listener = new TcpListener(IPAddress.Parse("192.168.236.36"), port);
                 listener.Start();
                 Console.WriteLine($"Server started. Listening on port {port}...");
 
@@ -32,7 +32,11 @@ namespace CafeteriaServer.Server
                     TcpClient client = await listener.AcceptTcpClientAsync();
                     Console.WriteLine("Client connected.");
 
-                    Task.Run(() => HandleClientAsync(client));
+                    // Create a new thread to handle the client connection
+                    Thread clientThread = new Thread(() => HandleClientAsync(client));
+                    clientThread.Start();
+
+                    //Task.Run(() => HandleClientAsync(client));
                 }
             }
             catch (Exception ex)

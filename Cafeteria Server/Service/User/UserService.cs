@@ -38,5 +38,18 @@ namespace CafeteriaServer.Service
         {
             return await _unitOfWork.MenuItems.GetAll();
         }
+
+        public async Task<User> GetUserById(int userId)
+        {
+            var user = await _unitOfWork.Users.GetById(userId);
+            if(user != null) 
+            { 
+                return user; 
+            }
+            else
+            {
+                throw new Exception("User not found");
+            }
+        }
     }
 }

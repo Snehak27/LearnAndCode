@@ -5,14 +5,15 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 
-namespace CafeteriaServer.Commands
+namespace CafeteriaServer.Commands.Chef
 {
-    public class SaveFinalMenuCommand : ICommand
+    public class GetEmployeeOrdersCommand : ICommand
     {
         private readonly IChefService _chefService;
-        private readonly ILogger<SaveFinalMenuCommand> _logger;
+        private readonly ILogger<GetEmployeeOrdersCommand> _logger;
 
-        public SaveFinalMenuCommand(IChefService chefService, ILogger<SaveFinalMenuCommand> logger)
+
+        public GetEmployeeOrdersCommand(IChefService chefService, ILogger<GetEmployeeOrdersCommand> logger)
         {
             _chefService = chefService;
             _logger = logger;
@@ -20,21 +21,21 @@ namespace CafeteriaServer.Commands
 
         public async Task<string> Execute(string requestData)
         {
-            _logger.LogInformation("Save final menu endpoint invoked");
+            _logger.LogInformation("Get employee orders endpoint invoked");
 
-            var response = new ResponseMessage();
+            var response = new ViewEmployeeOrdersResponse();
 
             try
             {
-                var request = JsonConvert.DeserializeObject<SaveFinalMenuRequest>(requestData);
-                await _chefService.SaveFinalMenu(request.MealTypeMenuItems);
+                var employeeOrders = await _chefService.GetEmployeeOrders();
                 response.IsSuccess = true;
+                response.EmployeeOrders = employeeOrders;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred");
                 response.IsSuccess = false;
-                response.ErrorMessage = ex.Message;
+                response.ErrorMessage = $"An error occurred while fetching employee responses: {ex.Message}";
             }
 
             return JsonConvert.SerializeObject(response);

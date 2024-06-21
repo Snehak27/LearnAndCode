@@ -5,6 +5,8 @@ using CafeteriaServer.UnitofWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 using System;
 
 namespace CafeteriaServer
@@ -17,6 +19,13 @@ namespace CafeteriaServer
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
+
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.ClearProviders();
+                loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                loggingBuilder.AddNLog(configuration);
+            });
 
             services.AddDbContext<CafeteriaContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
