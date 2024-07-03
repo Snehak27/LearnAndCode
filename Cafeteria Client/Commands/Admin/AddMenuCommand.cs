@@ -30,33 +30,61 @@ namespace CafeteriaClient.Commands
                 }
             }
 
-            bool availabilityStatus = false;
-            while (true)
-            {
-                Console.WriteLine("Enter availability status (true/false, leave blank to default to false):");
-                string availabilityStatusInput = Console.ReadLine();
-                if (string.IsNullOrEmpty(availabilityStatusInput) || bool.TryParse(availabilityStatusInput, out availabilityStatus))
-                {
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter 'true' or 'false'.");
-                }
-            }
+            bool availabilityStatus = GetBooleanInput("Enter availability status (true/false, leave blank to default to false):");
 
-            var menuItem= new MenuItemRequest
+            // Display options and get the selection for food type
+            Console.WriteLine("Select food type:");
+            var foodTypeOptions = new Dictionary<int, string>
+            {
+                { 1, "Vegetarian" },
+                { 2, "Non-Vegetarian" },
+                { 3, "Eggetarian" }
+            };
+            DisplayOptions(foodTypeOptions);
+            int foodTypeId = GetValidSelection(foodTypeOptions.Count);
+
+            // Display options and get the selection for spice level
+            Console.WriteLine("Select spice level:");
+            var spiceLevelOptions = new Dictionary<int, string>
+            {
+                { 1, "High" },
+                { 2, "Medium" },
+                { 3, "Low" }
+            };
+            DisplayOptions(spiceLevelOptions);
+            int spiceLevelId = GetValidSelection(spiceLevelOptions.Count);
+
+            // Display options and get the selection for cuisine type
+            Console.WriteLine("Select cuisine type:");
+            var cuisineTypeOptions = new Dictionary<int, string>
+            {
+                { 1, "North Indian" },
+                { 2, "South Indian" },
+                { 3, "Other" }
+            };
+            DisplayOptions(cuisineTypeOptions);
+            int cuisineTypeId = GetValidSelection(cuisineTypeOptions.Count);
+
+            bool isSweet = GetBooleanInput("Is it a sweet dish? (true/false, leave blank to default to false):");
+
+            var menuItem = new MenuItemRequest
             {
                 ItemName = itemName,
                 Price = price,
                 AvailabilityStatus = availabilityStatus,
+                FoodTypeId = foodTypeId,
+                SpiceLevelId = spiceLevelId,
+                CuisineTypeId = cuisineTypeId,
+                IsSweet = isSweet
             };
 
             string menurequestJson = JsonConvert.SerializeObject(menuItem);
 
-            var request = new RequestObject();
-            request.CommandName = "addMenu";
-            request.RequestData = menurequestJson;
+            var request = new RequestObject
+            {
+                CommandName = "addMenu",
+                RequestData = menurequestJson
+            };
 
             string responseJson = await clientSocket.SendRequest(request);
             var response = JsonConvert.DeserializeObject<ResponseMessage>(responseJson);
@@ -69,6 +97,51 @@ namespace CafeteriaClient.Commands
             {
                 Console.WriteLine("Failed to add menu item: " + response.ErrorMessage);
             }
+        }
+
+        private void DisplayOptions(Dictionary<int, string> options)
+        {
+            foreach (var option in options)
+            {
+                Console.WriteLine($"{option.Key}) {option.Value}");
+            }
+        }
+
+        private int GetValidSelection(int maxOption)
+        {
+            int selection;
+            while (true)
+            {
+                string input = Console.ReadLine();
+                if (int.TryParse(input, out selection) && selection > 0 && selection <= maxOption)
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine($"Invalid input. Please enter a number between 1 and {maxOption}.");
+                }
+            }
+            return selection;
+        }
+
+        private bool GetBooleanInput(string prompt)
+        {
+            bool result = false;
+            while (true)
+            {
+                Console.WriteLine(prompt);
+                string input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input) || bool.TryParse(input, out result))
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter 'true' or 'false'.");
+                }
+            }
+            return result;
         }
     }
 }

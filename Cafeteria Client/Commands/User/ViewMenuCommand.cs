@@ -6,6 +6,13 @@ namespace CafeteriaClient.Commands
 {
     public class ViewMenuCommand : ICommand
     {
+        private readonly Dictionary<int, string> foodTypeOptions = new Dictionary<int, string>
+        {
+            { 1, "Vegetarian" },
+            { 2, "Non-Vegetarian" },
+            { 3, "Eggetarian" }
+        };
+
         public async Task Execute(ClientSocket clientSocket)
         {
             try
@@ -23,13 +30,13 @@ namespace CafeteriaClient.Commands
                 {
                     Console.WriteLine("Menu Items:");
                     Console.WriteLine("-----------------------------------------------------------------------------------------");
-                    Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", "Sl No.", "Name", "Price", "AvailabilityStatus");
+                    Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3, -15} | {4,-20} ", "Sl No.", "Name", "Price", "FoodType", "AvailabilityStatus");
                     Console.WriteLine("-----------------------------------------------------------------------------------------");
 
                     int serialNumber = 1;
                     foreach (var menuItem in response.MenuItems)
                     {
-                        Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, menuItem.AvailabilityStatus);
+                        Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3, -15} | {4,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, GetOptionName(foodTypeOptions, menuItem.FoodTypeId), menuItem.AvailabilityStatus);
                         serialNumber++;
                     }
 
@@ -45,5 +52,11 @@ namespace CafeteriaClient.Commands
                 Console.WriteLine("Error: " + ex.Message);
             }
         }
+
+        private string GetOptionName(Dictionary<int, string> options, int id)
+        {
+            return options.ContainsKey(id) ? options[id] : "Unknown";
+        }
+
     }
 }

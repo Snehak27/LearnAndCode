@@ -19,10 +19,12 @@ namespace CafeteriaClient.Commands.Employee
         {
             try
             {
+                int userId = _getUserId();
+
                 var request = new RequestObject
                 {
                     CommandName = "getEmployeeRecommendations",
-                    RequestData = string.Empty
+                    RequestData = JsonConvert.SerializeObject(new { UserId = userId })
                 };
 
                 string responseJson = await clientSocket.SendRequest(request);
@@ -98,8 +100,6 @@ namespace CafeteriaClient.Commands.Employee
                         }
                     }
 
-                    int userId = _getUserId();
-
                     var employeeResponseRequest = new EmployeeOrderRequest
                     {
                         UserId = userId,
@@ -156,6 +156,7 @@ namespace CafeteriaClient.Commands.Employee
                     serialNo++;
                 }
                 Console.WriteLine("----------------------------------------------------------------------------------------------------");
+                Console.WriteLine($"Recommended item: {mealTypeRecommendation.TopRecommendedItem.MenuItemName}");
             }
 
             return menuItemMapping;

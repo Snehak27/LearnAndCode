@@ -6,6 +6,27 @@ namespace CafeteriaClient.Commands.Admin
 {
     public class UpdateMenuCommand : ICommand
     {
+        private readonly Dictionary<int, string> foodTypeOptions = new Dictionary<int, string>
+        {
+            { 1, "Vegetarian" },
+            { 2, "Non-Vegetarian" },
+            { 3, "Eggetarian" }
+        };
+
+        private readonly Dictionary<int, string> spiceLevelOptions = new Dictionary<int, string>
+        {
+            { 1, "High" },
+            { 2, "Medium" },
+            { 3, "Low" }
+        };
+
+        private readonly Dictionary<int, string> cuisineTypeOptions = new Dictionary<int, string>
+        {
+            { 1, "North Indian" },
+            { 2, "South Indian" },
+            { 3, "Other" }
+        };
+
         public async Task Execute(ClientSocket clientSocket)
         {
             try
@@ -22,18 +43,26 @@ namespace CafeteriaClient.Commands.Admin
                 if (response.IsSuccess)
                 {
                     Console.WriteLine("Menu Items:");
-                    Console.WriteLine("-----------------------------------------------------------------------------------");
-                    Console.WriteLine("| {0, -10} | {1, -20}  | {2, 10} | {3, -20} ", "ID", "Name", "Price", "AvailabilityStatus");
-                    Console.WriteLine("-----------------------------------------------------------------------------------");
+                    Console.WriteLine("--------------------------------------------------------------------------------------------------------------------------------");
+                    Console.WriteLine("| {0, -5} | {1, -20} | {2, 10} | {3, -15} | {4, -10} | {5, -15} | {6, -10} | {7, -10} ", "ID", "Name", "Price", "FoodType", "SpiceLevel", "CuisineType", "IsSweet", "Availability");
+                    Console.WriteLine("--------------------------------------------------------------------------------------------------------------------------------");
 
                     int serialNumber = 1;
                     foreach (var menuItem in response.MenuItems)
                     {
-                        Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, menuItem.AvailabilityStatus);
+                        Console.WriteLine("| {0, -5} | {1, -20} | {2, 10} | {3, -15} | {4, -10} | {5, -15} | {6, -10} | {7, -10} ",
+                            serialNumber,
+                            menuItem.ItemName,
+                            menuItem.Price,
+                            GetOptionName(foodTypeOptions, menuItem.FoodTypeId),
+                            GetOptionName(spiceLevelOptions, menuItem.SpiceLevelId),
+                            GetOptionName(cuisineTypeOptions, menuItem.CuisineTypeId),
+                            menuItem.IsSweet ? "Yes" : "No",
+                            menuItem.AvailabilityStatus ? "Available" : "Unavailable");
                         serialNumber++;
                     }
 
-                    Console.WriteLine("-----------------------------------------------------------------------------------");
+                    Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------");
                 }
                 else
                 {
@@ -64,30 +93,32 @@ namespace CafeteriaClient.Commands.Admin
                     newPrice = parsedPrice;
                 }
 
-                Console.WriteLine("Enter new availability status (true/false, leave blank to keep current):");
-                string newAvailabilityStatusInput = Console.ReadLine();
-                bool newAvailabilityStatus = menuItemToUpdate.AvailabilityStatus;
-                if (!string.IsNullOrEmpty(newAvailabilityStatusInput))
-                {
-                    while (!bool.TryParse(newAvailabilityStatusInput, out newAvailabilityStatus))
-                    {
-                        Console.WriteLine("Invalid input. Please enter 'true' or 'false' for the availability status, or leave blank to keep current:");
-                        newAvailabilityStatusInput = Console.ReadLine();
+                bool newAvailabilityStatus = GetBooleanInput($"Enter new availability status (true/false, leave blank to keep current):", menuItemToUpdate.AvailabilityStatus);
 
-                        if (string.IsNullOrEmpty(newAvailabilityStatusInput))
-                        {
-                            newAvailabilityStatus = menuItemToUpdate.AvailabilityStatus;
-                            break;
-                        }
-                    }
-                }
+                Console.WriteLine("Select new food type (leave blank to keep current):");
+                DisplayOptions(foodTypeOptions);
+                int newFoodTypeId = GetValidSelection(foodTypeOptions.Count, menuItemToUpdate.FoodTypeId);
+
+                Console.WriteLine("Select new spice level (leave blank to keep current):");
+                DisplayOptions(spiceLevelOptions);
+                int newSpiceLevelId = GetValidSelection(spiceLevelOptions.Count, menuItemToUpdate.SpiceLevelId);
+
+                Console.WriteLine("Select new cuisine type (leave blank to keep current):");
+                DisplayOptions(cuisineTypeOptions);
+                int newCuisineTypeId = GetValidSelection(cuisineTypeOptions.Count, menuItemToUpdate.CuisineTypeId);
+
+                bool newIsSweet = GetBooleanInput("Is it a sweet dish? (true/false, leave blank to keep current):", menuItemToUpdate.IsSweet);
 
                 var updateMenuItemRequest = new MenuItem
                 {
                     MenuItemId = menuItemToUpdate.MenuItemId,
                     ItemName = newName,
                     Price = newPrice,
-                    AvailabilityStatus = newAvailabilityStatus
+                    AvailabilityStatus = newAvailabilityStatus,
+                    FoodTypeId = newFoodTypeId,
+                    SpiceLevelId = newSpiceLevelId,
+                    CuisineTypeId = newCuisineTypeId,
+                    IsSweet = newIsSweet
                 };
 
                 string updateRequestJson = JsonConvert.SerializeObject(updateMenuItemRequest);
@@ -114,5 +145,64 @@ namespace CafeteriaClient.Commands.Admin
                 Console.WriteLine($"Error executing update menu command: {ex.Message}");
             }
         }
+
+        private string GetOptionName(Dictionary<int, string> options, int id)
+        {
+            return options.ContainsKey(id) ? options[id] : "Unknown";
+        }
+
+        private void DisplayOptions(Dictionary<int, string> options)
+        {
+            foreach (var option in options)
+            {
+                Console.WriteLine($"{option.Key}) {option.Value}");
+            }
+        }
+
+        private int GetValidSelection(int maxOption, int currentSelection)
+        {
+            int selection;
+            while (true)
+            {
+                string input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input))
+                {
+                    return currentSelection;
+                }
+                if (int.TryParse(input, out selection) && selection > 0 && selection <= maxOption)
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine($"Invalid input. Please enter a number between 1 and {maxOption}.");
+                }
+            }
+            return selection;
+        }
+
+        private bool GetBooleanInput(string prompt, bool currentValue)
+        {
+            bool result = currentValue;
+            while (true)
+            {
+                Console.WriteLine(prompt);
+                string input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input))
+                {
+                    return result;
+                }
+                if (bool.TryParse(input, out result))
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter 'true' or 'false'.");
+                }
+            }
+            return result;
+        }
     }
 }
+

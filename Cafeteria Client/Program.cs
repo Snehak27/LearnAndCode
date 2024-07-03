@@ -16,7 +16,7 @@ public class Program
     {
         while (true)
         {
-            var clientSocket = new ClientSocket("192.168.236.36", port);
+            var clientSocket = new ClientSocket("192.168.4.224", port);
             var _dispatcher = new CommandDispatcher();
 
             _dispatcher.RegisterCommand("login", new LoginCommand(async (id, roleId) =>
@@ -56,14 +56,17 @@ public class Program
                 dispatcher.RegisterCommand("3", new ViewMonthlyFeedbackReportCommand());
                 dispatcher.RegisterCommand("4", new RolloutMenuCommand());
                 dispatcher.RegisterCommand("5", new ViewEmployeeOrdersCommand());
+                dispatcher.RegisterCommand("6", new ViewDiscardMenuListCommand());
 
                 break;
 
             case 3:
                 //Register employee commands
-                dispatcher.RegisterCommand("1", new ViewMenuCommand());
-                dispatcher.RegisterCommand("2", new SumitFeedbackCommand(() => userId));
-                dispatcher.RegisterCommand("3", new ViewEmployeeRecommendationsCommand(() => userId));
+                dispatcher.RegisterCommand("1", new UpdateProfileCommand(() => userId));
+                dispatcher.RegisterCommand("2", new ViewMenuCommand());
+                dispatcher.RegisterCommand("3", new SumitFeedbackCommand(() => userId));
+                dispatcher.RegisterCommand("4", new ViewEmployeeRecommendationsCommand(() => userId));
+                dispatcher.RegisterCommand("5", new ProvideFeedbackCommand(() => userId));
                 break;
 
             default:
@@ -83,7 +86,7 @@ public class Program
             {
                 exit = true;
             }
-            else if ((roleId == 1 && commandKey == "5") || (roleId == 2 && commandKey == "6") || (roleId == 3 && commandKey == "4"))
+            else if ((roleId == 1 && commandKey == "5") || (roleId == 2 && commandKey == "7") || (roleId == 3 && commandKey == "6"))
             {
                 exit = true;
                 await dispatcher.Dispatch("logout", clientSocket);
@@ -115,15 +118,18 @@ public class Program
                 Console.WriteLine("3) View Monthly Feedback report");
                 Console.WriteLine("4) Roll out menu for next day");
                 Console.WriteLine("5) View Employee Orders");
-                Console.WriteLine("6) Logout");
+                Console.WriteLine("6) View dicard Menu list");
+                Console.WriteLine("7) Logout");
                 break;
 
             case 3:
                 Console.WriteLine("\nEmployee operations");
-                Console.WriteLine("1) View Menu");
-                Console.WriteLine("2) Give Feedback");
-                Console.WriteLine("3) View Recommendations for next day and order");
-                Console.WriteLine("4) Logout");
+                Console.WriteLine("1) View Profile");
+                Console.WriteLine("2) View Menu");
+                Console.WriteLine("3) Give Feedback");
+                Console.WriteLine("4) View Recommendations for next day and order");
+                Console.WriteLine("5) Provide detailed feedback for discard menu items");
+                Console.WriteLine("6) Logout");
                 break;
 
             default:
