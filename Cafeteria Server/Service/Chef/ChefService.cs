@@ -174,24 +174,6 @@ namespace CafeteriaServer.Service
             _unitOfWork.Save();
         }
 
-        //public async Task<List<DiscardMenuItem>> GetDiscardMenuItems()
-        //{
-        //    var menuItems = await _unitOfWork.MenuItems.GetAll();
-        //    var feedbacks = await _unitOfWork.Feedbacks.GetAll();
-
-        //    var discardItems = menuItems
-        //        .Select(item => new DiscardMenuItem
-        //        {
-        //            MenuItemId = item.MenuItemId,
-        //            MenuItemName = item.ItemName,
-        //            AverageRating = feedbacks.Where(f => f.OrderItem.RecommendedItem.MenuItemId == item.MenuItemId).Average(f => f.Rating),
-        //            Sentiments = feedbacks.Where(f => f.OrderItem.RecommendedItem.MenuItemId == item.MenuItemId).Select(f => f.Comment).ToList()
-        //        })
-        //        .Where(item => item.AverageRating < 2 || item.Sentiments.Any(s => s.Contains("bad") || s.Contains("poor") || s.Contains("tasteless")))
-        //        .ToList();
-
-        //    return discardItems;
-        //}
         public async Task<List<DiscardMenuItem>> GetDiscardMenuItems()
         {
             var allRecommendations = await _recommendationService.GetRecommendations();
@@ -229,10 +211,9 @@ namespace CafeteriaServer.Service
                 var menuItem = await _unitOfWork.MenuItems.GetById(menuItemId);
                 if (menuItem != null)
                 {
-                    //menuItem.IsDeleted = true;
-                    _unitOfWork.MenuItems.Delete(menuItem);
+                    menuItem.IsDeleted = true;
+                    _unitOfWork.MenuItems.Update(menuItem);
 
-                    // Log the discarded menu item
                     await AddDiscardedMenuItem(menuItem.ItemName, DateTime.Now);
                 }
             }
@@ -272,7 +253,6 @@ namespace CafeteriaServer.Service
                         IsRead = false,
                         CreatedAt = DateTime.Now,
                         MenuItemId = menuItemId,
-                        //NotificationMessage = $"We are trying to improve your experience with {menuItem.ItemName}. Please provide your feedback."
                     };
                     await _unitOfWork.UserNotifications.Add(userNotification);
                 }

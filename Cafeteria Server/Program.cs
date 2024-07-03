@@ -1,13 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using CafeteriaServer.Context;
 using CafeteriaServer.Service;
-using CafeteriaServer.UnitofWork;
-using Microsoft.Extensions.Configuration;
 using CafeteriaServer.Server;
 using CafeteriaServer.Commands;
-using CafeteriaServer.DAL.Repositories;
 using CafeteriaServer.Commands.Admin;
 using CafeteriaServer.Commands.Chef;
 using CafeteriaServer;

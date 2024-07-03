@@ -21,13 +21,11 @@ namespace CafeteriaServer.Service
         {
             var feedback = new Feedback
             {
-                //MenuItemId = feedbackRequest.MenuItemId,
                 UserId = feedbackRequest.UserId,
                 Comment = feedbackRequest.Comment,
                 Rating = feedbackRequest.Rating,
                 FeedbackDate = DateTime.Now,
                 OrderItemId = feedbackRequest.OrderItemId,
-                //MealTypeId = feedbackRequest.MealTypeId,
             };
 
             await _unitOfWork.Feedbacks.Add(feedback);
@@ -110,7 +108,6 @@ namespace CafeteriaServer.Service
                         .ThenByDescending(item => item.IsSweet == preference.HasSweetTooth)
                         .ToList();
 
-                    // Get the top recommended item
                     var topRecommendedItem = items.FirstOrDefault();
 
                     mealTypeRecommendations.Add(new MealTypeRecommendation
@@ -192,23 +189,6 @@ namespace CafeteriaServer.Service
 
             return pastOrders;
         }
-        //var daysLimit = DateTime.Now.AddDays(-3);
-
-        //var pastOrdersRaw = (await _unitOfWork.OrderItems
-        //    .FindAll(eri => eri.Order.UserId == userId && eri.Order.OrderDate >= daysLimit))
-        //    .ToList();
-
-        //var pastOrders = pastOrdersRaw.Select(eri => new PastOrderResponse
-        //{
-        //    OrderId = eri.OrderId,
-        //    MenuItemId = eri.RecommendedItem.MenuItemId,
-        //    MenuItemName = eri.RecommendedItem.MenuItem.ItemName,
-        //    OrderDate = eri.Order.OrderDate,
-        //    MealTypeId = eri.RecommendedItem.Recommendation.MealTypeId,
-        //    OrderItemId = eri.OrderItemId
-        //}).ToList();
-
-        //return pastOrders;
 
         public async Task<IEnumerable<FoodType>> GetAllFoodPreferences()
         {
@@ -291,68 +271,16 @@ namespace CafeteriaServer.Service
             return true;
         }
 
-        /*
         public async Task<List<MenuItem>> GetPendingFeedbackMenuItems(int userId)
         {
             var notificationTypeId = 4;
             var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
             var notifications = await GetUserNotifications(userId, notificationTypeId, startOfMonth);
-            //var pendingFeedbackItems = notifications.Select(n => n.MenuItemId).Distinct().ToList();
-
-            //var providedFeedbackItemIds = await GetProvidedFeedbackMenuItemIds(userId, pendingFeedbackItems);
-
-            //var pendingMenuItemIds = pendingFeedbackItems.Except(providedFeedbackItemIds).ToList();
             var pendingFeedbackItems = notifications.Select(n => n.MenuItemId.GetValueOrDefault()).Distinct().ToList();
-
             var providedFeedbackItemIds = await GetProvidedFeedbackMenuItemIds(userId, pendingFeedbackItems);
-
             var pendingMenuItemIds = pendingFeedbackItems.Except(providedFeedbackItemIds).ToList();
 
-            var pendingMenuItems = (await _unitOfWork.MenuItems
-                .FindAll(m => pendingMenuItemIds.Contains(m.MenuItemId)))
-                .ToList();
-
-            return pendingMenuItems;
-        }
-
-        private async Task<List<UserNotification>> GetUserNotifications(int userId, int notificationTypeId, DateTime startOfMonth)
-        {
-            var notifications = (await _unitOfWork.UserNotifications
-                .FindAll(n => n.UserId == userId && n.NotificationTypeId == notificationTypeId && n.CreatedAt >= startOfMonth))
-                .ToList();
-
-            return notifications.Select(n => new UserNotification { MenuItemId = n.MenuItemId }).ToList();
-        }
-
-        private async Task<List<int>> GetProvidedFeedbackMenuItemIds(int userId, List<int> menuItemIds)
-        {
-            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            var providedFeedbacks = (await _unitOfWork.DetailedFeedbacks
-                .FindAll(f => f.UserId == userId && menuItemIds.Contains(f.MenuItemId) && f.FeedbackDate >= startOfMonth))
-                .ToList();
-
-            return providedFeedbacks.Select(f => f.MenuItemId).ToList();
-        }
-        */
-        public async Task<List<MenuItem>> GetPendingFeedbackMenuItems(int userId)
-        {
-            var notificationTypeId = 4;
-            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-
-            // Get notifications for the current month
-            var notifications = await GetUserNotifications(userId, notificationTypeId, startOfMonth);
-
-            // Get distinct MenuItemIds from notifications
-            var pendingFeedbackItems = notifications.Select(n => n.MenuItemId.GetValueOrDefault()).Distinct().ToList();
-
-            // Get MenuItemIds for which feedback has already been provided
-            var providedFeedbackItemIds = await GetProvidedFeedbackMenuItemIds(userId, pendingFeedbackItems);
-
-            // Filter out items for which feedback has already been provided
-            var pendingMenuItemIds = pendingFeedbackItems.Except(providedFeedbackItemIds).ToList();
-
-            // Get menu items for the remaining pending MenuItemIds
             var pendingMenuItems = (await _unitOfWork.MenuItems
                 .FindAll(m => pendingMenuItemIds.Contains(m.MenuItemId)))
                 .ToList();
