@@ -1,5 +1,6 @@
 ﻿using CafeteriaServer.DAL.Models;
 using CafeteriaServer.DTO;
+using CafeteriaServer.DTO.ResponseModel;
 using CafeteriaServer.UnitofWork;
 using System;
 
@@ -171,6 +172,126 @@ namespace CafeteriaServer.Service
             }
 
             _unitOfWork.Save();
+        }
+
+        //public async Task<List<DiscardMenuItem>> GetDiscardMenuItems()
+        //{
+        //    var menuItems = await _unitOfWork.MenuItems.GetAll();
+        //    var feedbacks = await _unitOfWork.Feedbacks.GetAll();
+
+        //    var discardItems = menuItems
+        //        .Select(item => new DiscardMenuItem
+        //        {
+        //            MenuItemId = item.MenuItemId,
+        //            MenuItemName = item.ItemName,
+        //            AverageRating = feedbacks.Where(f => f.OrderItem.RecommendedItem.MenuItemId == item.MenuItemId).Average(f => f.Rating),
+        //            Sentiments = feedbacks.Where(f => f.OrderItem.RecommendedItem.MenuItemId == item.MenuItemId).Select(f => f.Comment).ToList()
+        //        })
+        //        .Where(item => item.AverageRating < 2 || item.Sentiments.Any(s => s.Contains("bad") || s.Contains("poor") || s.Contains("tasteless")))
+        //        .ToList();
+
+        //    return discardItems;
+        //}
+        public async Task<List<DiscardMenuItem>> GetDiscardMenuItems()
+        {
+            var allRecommendations = await _recommendationService.GetRecommendations();
+
+            var filteredRecommendations = allRecommendations
+                .SelectMany(r => r.Recommendations)
+                .GroupBy(r => r.MenuItemId)
+                .Select(g => new
+                {
+                    MenuItemId = g.Key,
+                    MenuItemName = g.First().MenuItemName,
+                    AverageRating = g.Average(r => r.AverageRating),
+                    Comments = g.SelectMany(r => r.Comments).ToList()
+                })
+                .ToList();
+
+            var discardItems = filteredRecommendations
+                .Where(item => item.AverageRating < 2)
+                .Select(item => new DiscardMenuItem
+                {
+                    MenuItemId = item.MenuItemId,
+                    MenuItemName = item.MenuItemName,
+                    AverageRating = item.AverageRating,
+                    Sentiments = item.Comments
+                })
+                .ToList();
+
+            return discardItems;
+        }
+
+        public async Task<bool> RemoveMenuItem(List<int> menuItemIds)
+        {
+            foreach (var menuItemId in menuItemIds)
+            {
+                var menuItem = await _unitOfWork.MenuItems.GetById(menuItemId);
+                if (menuItem != null)
+                {
+                    //menuItem.IsDeleted = true;
+                    _unitOfWork.MenuItems.Delete(menuItem);
+
+                    // Log the discarded menu item
+                    await AddDiscardedMenuItem(menuItem.ItemName, DateTime.Now);
+                }
+            }
+            _unitOfWork.Save();
+            return true;
+        }
+
+        private async Task AddDiscardedMenuItem(string menuItemName, DateTime discardDate)
+        {
+            var discardedMenuItem = new DiscardedMenuItem
+            {
+                MenuItemName = menuItemName,
+                DiscardDate = discardDate
+            };
+            await _unitOfWork.DiscardedMenuItems.Add(discardedMenuItem);
+            _unitOfWork.Save();
+        }
+
+        public async Task<bool> RequestDetailedFeedback(List<int> menuItemIds)
+        {
+            foreach (var menuItemId in menuItemIds)
+            {
+                var users = await _unitOfWork.Users.FindAll(u => u.RoleId == 3);
+                var menuItem = await _unitOfWork.MenuItems.GetById(menuItemId);
+
+                if (menuItem == null)
+                {
+                    return false;
+                }
+
+                foreach (var user in users)
+                {
+                    var userNotification = new UserNotification
+                    {
+                        UserId = user.UserId,
+                        NotificationTypeId = 4,
+                        IsRead = false,
+                        CreatedAt = DateTime.Now,
+                        MenuItemId = menuItemId,
+                        //NotificationMessage = $"We are trying to improve your experience with {menuItem.ItemName}. Please provide your feedback."
+                    };
+                    await _unitOfWork.UserNotifications.Add(userNotification);
+                }
+
+                _unitOfWork.Save();
+            }
+            return true;
+        }
+
+        public async Task<DateTime?> GetLastDiscardDate()
+        {
+            var logs = await _unitOfWork.DiscardedMenuItems.GetAll();
+            var log = logs.OrderByDescending(l => l.DiscardDate).FirstOrDefault();
+            return log?.DiscardDate;
+        }
+
+        public async Task<List<DetailedFeedback>> GetAllDetailedFeedbacks()
+        {
+            return (await _unitOfWork.DetailedFeedbacks.GetAll()).ToList();
         }
     }
 }

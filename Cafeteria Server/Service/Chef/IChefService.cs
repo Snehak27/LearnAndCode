@@ -1,4 +1,6 @@
-﻿using CafeteriaServer.DTO;
+﻿using CafeteriaServer.DAL.Models;
+using CafeteriaServer.DTO;
+using CafeteriaServer.DTO.ResponseModel;
 using System;
 
 namespace CafeteriaServer.Service
@@ -10,5 +12,12 @@ namespace CafeteriaServer.Service
         Task<List<EmployeeOrderSummary>> GetEmployeeOrders();
         Task SaveFinalMenu(List<MealTypeMenuItemList> mealTypeMenuItems);
         Task<List<MealTypeRecommendations>> GetRecommendations();
+        Task<List<DiscardMenuItem>> GetDiscardMenuItems();
+        //Task<bool> RemoveMenuItem(int menuItemId);
+        Task<bool> RemoveMenuItem(List<int> menuItemIds);
+        Task<bool> RequestDetailedFeedback(List<int> menuItemIds);
+        //Task<bool> RequestDetailedFeedback(int menuItemId);
+        Task<DateTime?> GetLastDiscardDate();
+        Task<List<DetailedFeedback>> GetAllDetailedFeedbacks();
     }
 }

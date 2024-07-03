@@ -14,6 +14,7 @@ using CafeteriaServer;
 using NLog;
 using NLog.Web;
 using Microsoft.Extensions.Logging;
+using CafeteriaServer.Commands.Employee;
 
 public class Program
 {
@@ -35,10 +36,9 @@ public class Program
             var employeeService = serviceProvider.GetService<IEmployeeService>();
             var chefService = serviceProvider.GetService<IChefService>();
             var notificationService = serviceProvider.GetService<INotificationService>();
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
 
             var dispatcher = new CommandDispatcher();
-
-            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
 
             dispatcher.RegisterCommand("login", new LoginCommand(userService, notificationService, loggerFactory.CreateLogger<LoginCommand>()));
             dispatcher.RegisterCommand("logout", new LogoutCommand(userService,loggerFactory.CreateLogger<LogoutCommand>()));
@@ -55,6 +55,13 @@ public class Program
             dispatcher.RegisterCommand("saveEmployeeOrders", new SaveEmployeeOrdersCommand(employeeService, loggerFactory.CreateLogger<SaveEmployeeOrdersCommand>()));
             dispatcher.RegisterCommand("getEmployeeOrders", new GetEmployeeOrdersCommand(chefService, loggerFactory.CreateLogger<GetEmployeeOrdersCommand>()));
             dispatcher.RegisterCommand("getPastOrders", new GetPastOrdersCommand(employeeService, loggerFactory.CreateLogger<GetPastOrdersCommand>()));
+            dispatcher.RegisterCommand("getDiscardMenuList", new GetDiscardMenuListCommand(chefService, loggerFactory.CreateLogger<GetDiscardMenuListCommand>()));
+            dispatcher.RegisterCommand("handleDiscardActions", new HandleDiscardActionsCommand(chefService, loggerFactory.CreateLogger<HandleDiscardActionsCommand>()));
+            dispatcher.RegisterCommand("updateProfile", new UpdateProfileCommand(employeeService));
+            dispatcher.RegisterCommand("getEmployeePreference", new GetEmployeePreferenceCommand(employeeService, loggerFactory.CreateLogger<GetEmployeePreferenceCommand>()));
+            dispatcher.RegisterCommand("getPendingFeedbackMenuItems", new GetPendingFeedbackMenuItemsCommand(employeeService, loggerFactory.CreateLogger<GetPendingFeedbackMenuItemsCommand>()));
+            dispatcher.RegisterCommand("submitDetailedFeedback", new SubmitDetailedFeedbackCommand(employeeService, loggerFactory.CreateLogger<SubmitDetailedFeedbackCommand>()));
+            dispatcher.RegisterCommand("getAllDetailedFeedbacks", new GetAllDetailedFeedbacksCommand(chefService, loggerFactory.CreateLogger<GetAllDetailedFeedbacksCommand>()));
 
             ServerSocket server = new ServerSocket(8888, dispatcher);
             await server.Start();

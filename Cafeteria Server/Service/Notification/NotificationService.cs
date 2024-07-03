@@ -24,7 +24,7 @@ namespace CafeteriaServer.Service
                 var notificationType = await _unitOfWork.NotificationTypes.GetById(notification.NotificationTypeId);
                 string message = notificationType?.NotificationMessage ?? "Unknown notification";
 
-                if (notification.NotificationTypeId == 1 || notification.NotificationTypeId == 2) 
+                if (notification.NotificationTypeId == 1 || notification.NotificationTypeId == 2 || notification.NotificationTypeId == 4) 
                 {
                     if (notification.MenuItemId.HasValue) 
                     {

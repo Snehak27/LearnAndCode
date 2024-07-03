@@ -1,4 +1,6 @@
 ﻿using CafeteriaServer.Commands.Admin;
+using CafeteriaServer.DTO;
+using CafeteriaServer.DTO.RequestModel;
 using CafeteriaServer.Service;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -22,7 +24,8 @@ namespace CafeteriaServer.Commands
         {
             _logger.LogInformation("Get employee recommendations endpoint invoked");
 
-            var response = await _employeeService.GetRecommendations();
+            var request = JsonConvert.DeserializeObject<ViewRecommendationRequest>(requestData);
+            var response = await _employeeService.GetRecommendations(request.UserId);
             return JsonConvert.SerializeObject(response);
         }
     }

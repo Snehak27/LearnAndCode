@@ -15,7 +15,12 @@ namespace CafeteriaServer.UnitofWork
         IUserNotificationRepository UserNotifications { get; }
         IMealTypeRepository MealTypes { get; }
         INotificationTypeRepository NotificationTypes { get; }
-
+        IFoodPreferenceRepository FoodPreferences { get; }
+        ISpiceLevelRepository SpiceLevels { get; }
+        ICuisinePreferenceRepository CuisinePreferences { get; }
+        IEmployeePreferenceRepository EmployeePreferences { get; }
+        IDetailedFeedbackRepository DetailedFeedbacks { get; }
+        IDiscardedMenuItemRepository DiscardedMenuItems { get; }
 
         void Save();
     }

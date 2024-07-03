@@ -25,6 +25,10 @@ namespace CafeteriaServer.DTO
         public int VoteCount { get; set; }
         public double AverageRating { get; set; }
         public string OverallSentiment { get; set; }
+        public string FoodType { get; set; }
+        public string SpiceLevel { get; set; }  
+        public string CuisineType { get; set; } 
+        public bool IsSweet { get; set; }
     }
 }
 

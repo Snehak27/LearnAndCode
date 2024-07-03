@@ -21,6 +21,12 @@ namespace CafeteriaServer.Context
         public DbSet<RecommendedItem> RecommendedItem { get; set;}
         public DbSet<UserNotification> UserNotification { get; set; }
         public DbSet<OrderItem> EmployeeResponseItem { get; set; }
+        public DbSet<FoodType> FoodTypes { get; set; }
+        public DbSet<SpiceLevel> SpiceLevels { get; set; }
+        public DbSet<CuisineType> CuisineTypes { get; set; }
+        public DbSet<EmployeePreference> EmployeePreferences { get; set; }
+        public DbSet<DetailedFeedback> DetailedFeedbacks { get; set; }
+        public DbSet<DiscardedMenuItem> DiscardedMenuItem { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

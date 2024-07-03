@@ -1,4 +1,5 @@
 ﻿using CafeteriaServer.Context;
+using CafeteriaServer.DAL.Models;
 using CafeteriaServer.DAL.Repositories;
 using CafeteriaServer.Repositories;
 using System;
@@ -22,6 +23,12 @@ namespace CafeteriaServer.UnitofWork
             UserNotifications = new UserNotificationRepository(_context);
             MealTypes = new MealTypeRepository(_context);
             NotificationTypes = new NotificationTypeRepository(_context);
+            FoodPreferences = new FoodPreferenceRepository(_context);
+            SpiceLevels = new SpiceLevelRepository(_context);
+            CuisinePreferences = new CuisinePreferenceRepository(_context);
+            EmployeePreferences = new EmployeePreferenceRepository(_context);
+            DetailedFeedbacks = new DetailedFeedbackRepository(_context);
+            DiscardedMenuItems = new DiscardMenuItemLogRepository(_context);
         }
 
         public IUserRepository Users { get; }
@@ -34,6 +41,12 @@ namespace CafeteriaServer.UnitofWork
         public IUserNotificationRepository UserNotifications { get; }
         public IMealTypeRepository MealTypes { get; }
         public INotificationTypeRepository NotificationTypes { get; }
+        public IFoodPreferenceRepository FoodPreferences { get;  }
+        public ISpiceLevelRepository SpiceLevels { get; }
+        public ICuisinePreferenceRepository CuisinePreferences { get; }
+        public IEmployeePreferenceRepository EmployeePreferences { get; }
+        public IDetailedFeedbackRepository DetailedFeedbacks { get; }
+        public IDiscardedMenuItemRepository DiscardedMenuItems { get; }
 
         public void Save()
         {

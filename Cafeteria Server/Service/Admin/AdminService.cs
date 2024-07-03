@@ -21,6 +21,10 @@ namespace CafeteriaServer.Service
                 ItemName = menuItemRequest.ItemName,
                 Price = menuItemRequest.Price,
                 AvailabilityStatus = menuItemRequest.AvailabilityStatus,
+                FoodTypeId = menuItemRequest.FoodTypeId,
+                SpiceLevelId = menuItemRequest.SpiceLevelId,
+                CuisineTypeId = menuItemRequest.CuisineTypeId,
+                IsSweet = menuItemRequest.IsSweet,
             };
 
             await _unitOfWork.MenuItems.Add(item);
@@ -61,6 +65,10 @@ namespace CafeteriaServer.Service
             item.ItemName = menuItem.ItemName;
             item.Price = menuItem.Price;
             item.AvailabilityStatus = menuItem.AvailabilityStatus;
+            item.FoodTypeId = menuItem.FoodTypeId;
+            item.CuisineTypeId = menuItem.CuisineTypeId;
+            item.SpiceLevelId = menuItem.SpiceLevelId;
+            item.IsSweet = menuItem.IsSweet;
 
             _unitOfWork.MenuItems.Update(item);
             _unitOfWork.Save();

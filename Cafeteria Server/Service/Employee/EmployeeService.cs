@@ -1,5 +1,7 @@
 ﻿using CafeteriaServer.DAL.Models;
 using CafeteriaServer.DTO;
+using CafeteriaServer.DTO.RequestModel;
+using CafeteriaServer.DTO.ResponseModel;
 using CafeteriaServer.UnitofWork;
 
 namespace CafeteriaServer.Service
@@ -34,10 +36,12 @@ namespace CafeteriaServer.Service
             return true;
         }
 
-        public async Task<EmployeeRecommendationResponse> GetRecommendations()
+        public async Task<EmployeeRecommendationResponse> GetRecommendations(int userId)
         {
             try
             {
+                var preference = await GetEmployeePreference(userId);
+
                 var mealTypes = await _unitOfWork.MealTypes.GetAll();
                 var today = DateTime.Now.Date;
                 var recommendations = (await _unitOfWork.Recommendations
@@ -77,7 +81,11 @@ namespace CafeteriaServer.Service
                             PredictedRating = 0,
                             Comments = new List<string>(),
                             OverallSentiment = string.Empty,
-                            RecommendedItemId = ri.RecommendedItemId
+                            RecommendedItemId = ri.RecommendedItemId,
+                            FoodType = ri.MenuItem.FoodType.FoodTypeName, 
+                            SpiceLevel = ri.MenuItem.SpiceLevel.Level, 
+                            CuisineType = ri.MenuItem.CuisineType.Cuisine, 
+                            IsSweet = ri.MenuItem.IsSweet 
                         })
                         .ToList();
 
@@ -94,11 +102,23 @@ namespace CafeteriaServer.Service
                         }
                     }
 
+                    // Sort the items based on all employee preferences
+                    items = items
+                        .OrderByDescending(item => item.FoodType == preference.FoodPreference)
+                        .ThenBy(item => item.SpiceLevel == preference.SpiceLevel)
+                        .ThenBy(item => item.CuisineType == preference.CuisinePreference)
+                        .ThenByDescending(item => item.IsSweet == preference.HasSweetTooth)
+                        .ToList();
+
+                    // Get the top recommended item
+                    var topRecommendedItem = items.FirstOrDefault();
+
                     mealTypeRecommendations.Add(new MealTypeRecommendation
                     {
                         MealTypeId = mealType.MealTypeId,
                         MealTypeName = mealType.MealTypeName,
-                        RecommendedItems = items
+                        RecommendedItems = items,
+                        TopRecommendedItem = topRecommendedItem
                     });
                 }
 
@@ -189,6 +209,176 @@ namespace CafeteriaServer.Service
         //}).ToList();
 
         //return pastOrders;
+
+        public async Task<IEnumerable<FoodType>> GetAllFoodPreferences()
+        {
+            return await _unitOfWork.FoodPreferences.GetAll();
+        }
+
+        public async Task<IEnumerable<SpiceLevel>> GetAllSpiceLevels()
+        {
+            return await _unitOfWork.SpiceLevels.GetAll();
+        }
+
+        public async Task<IEnumerable<CuisineType>> GetAllCuisinePreferences()
+        {
+            return await _unitOfWork.CuisinePreferences.GetAll();
+        }
+
+        public async Task<bool> UpdateEmployeePreference(UpdateProfileRequest request)
+        {
+            var employeePreference = await _unitOfWork.EmployeePreferences.Find(u => u.UserId == request.UserId);
+
+            if (employeePreference == null)
+            {
+                employeePreference = new EmployeePreference
+                {
+                    UserId = request.UserId,
+                    FoodTypeId = request.FoodTypeId,
+                    SpiceLevelId = request.SpiceLevelId,
+                    CuisineTypeId = request.CuisineTypeId,
+                    HasSweetTooth = request.HasSweetTooth
+                };
+                await _unitOfWork.EmployeePreferences.Add(employeePreference);
+            }
+            else
+            {
+                employeePreference.FoodTypeId = request.FoodTypeId;
+                employeePreference.SpiceLevelId = request.SpiceLevelId;
+                employeePreference.CuisineTypeId = request.CuisineTypeId;
+                employeePreference.HasSweetTooth = request.HasSweetTooth;
+
+                _unitOfWork.EmployeePreferences.Update(employeePreference);
+            }
+
+            _unitOfWork.Save();
+            return true;
+        }
+
+        public async Task<PreferenceResponse> GetEmployeePreference(int userId)
+        {
+            var preference = await _unitOfWork.EmployeePreferences.Find(e => e.UserId == userId);
+            if (preference != null)
+            {
+                return new PreferenceResponse
+                {
+                    FoodPreference = preference.FoodType.FoodTypeName,
+                    SpiceLevel = preference.SpiceLevel.Level,
+                    CuisinePreference = preference.CuisineType.Cuisine,
+                    HasSweetTooth = preference.HasSweetTooth
+                };
+            }
+            else
+            {
+                throw new Exception("Employee Preference not found");
+            }
+        }
+
+        public async Task<bool> SubmitDetailedFeedback(DetailedFeedbackRequest request)
+        {
+            var feedback = new DetailedFeedback
+            {
+                UserId = request.UserId,
+                MenuItemId = request.MenuItemId,
+                DislikeReason = request.Answers[0],
+                PreferredTaste = request.Answers[1],
+                Recipe = request.Answers[2],
+                FeedbackDate = DateTime.Now
+            };
+
+            await _unitOfWork.DetailedFeedbacks.Add(feedback);
+            _unitOfWork.Save();
+            return true;
+        }
+
+        /*
+        public async Task<List<MenuItem>> GetPendingFeedbackMenuItems(int userId)
+        {
+            var notificationTypeId = 4;
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+            var notifications = await GetUserNotifications(userId, notificationTypeId, startOfMonth);
+            //var pendingFeedbackItems = notifications.Select(n => n.MenuItemId).Distinct().ToList();
+
+            //var providedFeedbackItemIds = await GetProvidedFeedbackMenuItemIds(userId, pendingFeedbackItems);
+
+            //var pendingMenuItemIds = pendingFeedbackItems.Except(providedFeedbackItemIds).ToList();
+            var pendingFeedbackItems = notifications.Select(n => n.MenuItemId.GetValueOrDefault()).Distinct().ToList();
+
+            var providedFeedbackItemIds = await GetProvidedFeedbackMenuItemIds(userId, pendingFeedbackItems);
+
+            var pendingMenuItemIds = pendingFeedbackItems.Except(providedFeedbackItemIds).ToList();
+
+            var pendingMenuItems = (await _unitOfWork.MenuItems
+                .FindAll(m => pendingMenuItemIds.Contains(m.MenuItemId)))
+                .ToList();
+
+            return pendingMenuItems;
+        }
+
+        private async Task<List<UserNotification>> GetUserNotifications(int userId, int notificationTypeId, DateTime startOfMonth)
+        {
+            var notifications = (await _unitOfWork.UserNotifications
+                .FindAll(n => n.UserId == userId && n.NotificationTypeId == notificationTypeId && n.CreatedAt >= startOfMonth))
+                .ToList();
+
+            return notifications.Select(n => new UserNotification { MenuItemId = n.MenuItemId }).ToList();
+        }
+
+        private async Task<List<int>> GetProvidedFeedbackMenuItemIds(int userId, List<int> menuItemIds)
+        {
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var providedFeedbacks = (await _unitOfWork.DetailedFeedbacks
+                .FindAll(f => f.UserId == userId && menuItemIds.Contains(f.MenuItemId) && f.FeedbackDate >= startOfMonth))
+                .ToList();
+
+            return providedFeedbacks.Select(f => f.MenuItemId).ToList();
+        }
+        */
+        public async Task<List<MenuItem>> GetPendingFeedbackMenuItems(int userId)
+        {
+            var notificationTypeId = 4;
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+            // Get notifications for the current month
+            var notifications = await GetUserNotifications(userId, notificationTypeId, startOfMonth);
+
+            // Get distinct MenuItemIds from notifications
+            var pendingFeedbackItems = notifications.Select(n => n.MenuItemId.GetValueOrDefault()).Distinct().ToList();
+
+            // Get MenuItemIds for which feedback has already been provided
+            var providedFeedbackItemIds = await GetProvidedFeedbackMenuItemIds(userId, pendingFeedbackItems);
+
+            // Filter out items for which feedback has already been provided
+            var pendingMenuItemIds = pendingFeedbackItems.Except(providedFeedbackItemIds).ToList();
+
+            // Get menu items for the remaining pending MenuItemIds
+            var pendingMenuItems = (await _unitOfWork.MenuItems
+                .FindAll(m => pendingMenuItemIds.Contains(m.MenuItemId)))
+                .ToList();
+
+            return pendingMenuItems;
+        }
+
+        private async Task<List<UserNotification>> GetUserNotifications(int userId, int notificationTypeId, DateTime startOfMonth)
+        {
+            var notifications = (await _unitOfWork.UserNotifications
+                .FindAll(n => n.UserId == userId && n.NotificationTypeId == notificationTypeId && n.CreatedAt >= startOfMonth))
+                .Where(n => n.MenuItemId.HasValue)
+                .ToList();
+
+            return notifications;
+        }
+
+        private async Task<List<int>> GetProvidedFeedbackMenuItemIds(int userId, List<int> menuItemIds)
+        {
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var providedFeedbacks = (await _unitOfWork.DetailedFeedbacks
+                .FindAll(f => f.UserId == userId && menuItemIds.Contains(f.MenuItemId) && f.FeedbackDate >= startOfMonth))
+                .Select(f => f.MenuItemId)
+                .ToList();
+
+            return providedFeedbacks;
+        }
     }
 }
-

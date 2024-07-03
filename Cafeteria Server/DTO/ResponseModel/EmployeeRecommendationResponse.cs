@@ -14,5 +14,6 @@ namespace CafeteriaServer.DTO
         public int MealTypeId { get; set; }
         public string MealTypeName { get; set; }
         public List<RecommendedItemResponse> RecommendedItems { get; set; }
+        public RecommendedItemResponse TopRecommendedItem {  get; set; }
     }
 }
