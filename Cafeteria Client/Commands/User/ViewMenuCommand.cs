@@ -57,6 +57,5 @@ namespace CafeteriaClient.Commands
         {
             return options.ContainsKey(id) ? options[id] : "Unknown";
         }
-
     }
 }

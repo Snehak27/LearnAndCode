@@ -136,6 +136,7 @@ namespace CafeteriaClient.Commands.Chef
             if (response.DetailedFeedbacks != null && response.DetailedFeedbacks.Any())
             {
                 Console.WriteLine("All Detailed Feedbacks:");
+                Console.WriteLine("--------------------------------------------------------------");
                 foreach (var feedback in response.DetailedFeedbacks)
                 {
                     Console.WriteLine($"Food Item: {feedback.MenuItemName}");

@@ -94,20 +94,20 @@ namespace CafeteriaClient.Commands
             {
                 string mealTypeName = GetMealTypeName(mealTypeRecommendation.MealTypeId);
                 Console.WriteLine($"\n{mealTypeName}:");
-                Console.WriteLine("-----------------------------------------------------------------------------------------------------");
-                Console.WriteLine("| {0, -10} | {1, -20} | {2, -20} | {3, -10} | {4, -10} | {5, -10} | {6, -30} ",
+                Console.WriteLine("---------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("| {0, -10} | {1, -20} | {2, -20} | {3, -15} | {4, -10} | {5, -10} | {6, -30} ",
                     "Sl No.", "Name", "Overall Rating", "No. of Votes", "Avg Rating", "Sentiment", "Comments");
-                Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+                Console.WriteLine("---------------------------------------------------------------------------------------------------------------");
 
                 for (int i = 0; i < mealTypeRecommendation.Recommendations.Count; i++)
                 {
                     var recommendation = mealTypeRecommendation.Recommendations[i];
-                    Console.WriteLine("| {0, -10} | {1, -20} | {2, -20:F2} | {3, -10} | {4, -10:F2} | {5, -10} | {6, -30} ",
+                    Console.WriteLine("| {0, -10} | {1, -20} | {2, -20:F2} | {3, -15} | {4, -10:F2} | {5, -10} | {6, -30} ",
                         (i + 1), recommendation.MenuItemName, recommendation.PredictedRating, recommendation.VoteCount,
                         recommendation.AverageRating, recommendation.OverallSentiment, string.Join(", ", recommendation.Comments));
                 }
 
-                Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+                Console.WriteLine("---------------------------------------------------------------------------------------------------------------");
             }
         }
 

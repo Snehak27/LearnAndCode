@@ -32,7 +32,6 @@ namespace CafeteriaClient.Commands
 
             bool availabilityStatus = GetBooleanInput("Enter availability status (true/false, leave blank to default to false):");
 
-            // Display options and get the selection for food type
             Console.WriteLine("Select food type:");
             var foodTypeOptions = new Dictionary<int, string>
             {
