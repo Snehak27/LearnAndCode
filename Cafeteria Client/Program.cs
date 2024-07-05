@@ -16,19 +16,20 @@ public class Program
     {
         while (true)
         {
-            var clientSocket = new ClientSocket("192.168.4.224", port);
-            var _dispatcher = new CommandDispatcher();
+            var clientSocket = new ClientSocket("192.168.1.4", port);
+            var dispatcher = new CommandDispatcher();
+            var commandRegistrar = new CommandRegistrar();
 
-            _dispatcher.RegisterCommand("login", new LoginCommand(async (id, roleId) =>
+            dispatcher.RegisterCommand("login", new LoginCommand(async (id, roleId) =>
             {
                 userId = id;
                 userRoleId = roleId;
-                await DisplayOperations(userRoleId, _dispatcher, clientSocket);
+                await DisplayOperations(userRoleId, dispatcher, commandRegistrar, clientSocket);
             }));
 
-            _dispatcher.RegisterCommand("logout", new LogoutCommand(ClearUserId, () => userId));
+            dispatcher.RegisterCommand("logout", new LogoutCommand(ClearUserId, () => userId));
 
-            await _dispatcher.Dispatch("login", clientSocket);
+            await dispatcher.Dispatch("login", clientSocket);
         }
     }
 
@@ -37,47 +38,49 @@ public class Program
         userId = 0;
     }
 
-    static async Task DisplayOperations(int roleId, CommandDispatcher dispatcher, ClientSocket clientSocket)
+    static async Task DisplayOperations(int roleId, CommandDispatcher dispatcher, CommandRegistrar commandRegistrar, ClientSocket clientSocket)
     {
-        switch (roleId)
-        {
-            case 1:
-                // Register admin commands
-                dispatcher.RegisterCommand("1", new AddMenuCommand());
-                dispatcher.RegisterCommand("2", new UpdateMenuCommand());
-                dispatcher.RegisterCommand("3", new DeleteMenuCommand());
-                dispatcher.RegisterCommand("4", new ViewMenuCommand());
-                break;
+        commandRegistrar.RegisterCommands(roleId, dispatcher, () => userId);
 
-            case 2:
-                //Register chef commands;
-                dispatcher.RegisterCommand("1", new ViewMenuCommand());
-                dispatcher.RegisterCommand("2", new ViewFeedbackCommand());
-                dispatcher.RegisterCommand("3", new ViewMonthlyFeedbackReportCommand());
-                dispatcher.RegisterCommand("4", new RolloutMenuCommand());
-                dispatcher.RegisterCommand("5", new ViewEmployeeOrdersCommand());
-                dispatcher.RegisterCommand("6", new ViewDiscardMenuListCommand());
+        //switch (roleId)
+        //{
+        //    case 1:
+        //        // Register admin commands
+        //        dispatcher.RegisterCommand("1", new AddMenuCommand());
+        //        dispatcher.RegisterCommand("2", new UpdateMenuCommand());
+        //        dispatcher.RegisterCommand("3", new DeleteMenuCommand());
+        //        dispatcher.RegisterCommand("4", new ViewMenuCommand());
+        //        break;
 
-                break;
+        //    case 2:
+        //        //Register chef commands;
+        //        dispatcher.RegisterCommand("1", new ViewMenuCommand());
+        //        dispatcher.RegisterCommand("2", new ViewFeedbackCommand());
+        //        dispatcher.RegisterCommand("3", new ViewMonthlyFeedbackReportCommand());
+        //        dispatcher.RegisterCommand("4", new RolloutMenuCommand());
+        //        dispatcher.RegisterCommand("5", new ViewEmployeeOrdersCommand());
+        //        dispatcher.RegisterCommand("6", new ViewDiscardMenuListCommand());
 
-            case 3:
-                //Register employee commands
-                dispatcher.RegisterCommand("1", new UpdateProfileCommand(() => userId));
-                dispatcher.RegisterCommand("2", new ViewMenuCommand());
-                dispatcher.RegisterCommand("3", new SumitFeedbackCommand(() => userId));
-                dispatcher.RegisterCommand("4", new ViewEmployeeRecommendationsCommand(() => userId));
-                dispatcher.RegisterCommand("5", new ProvideFeedbackCommand(() => userId));
-                break;
+        //        break;
 
-            default:
-                Console.WriteLine("Invalid role.");
-                break;
-        }
+        //    case 3:
+        //        //Register employee commands
+        //        dispatcher.RegisterCommand("1", new UpdateProfileCommand(() => userId));
+        //        dispatcher.RegisterCommand("2", new ViewMenuCommand());
+        //        dispatcher.RegisterCommand("3", new SumitFeedbackCommand(() => userId));
+        //        dispatcher.RegisterCommand("4", new ViewEmployeeRecommendationsCommand(() => userId));
+        //        dispatcher.RegisterCommand("5", new ProvideFeedbackCommand(() => userId));
+        //        break;
+
+        //    default:
+        //        Console.WriteLine("Invalid role.");
+        //        break;
+        //}
 
         bool exit = false;
         while (!exit)
         {
-            DisplayRoleOperations(roleId);
+            DisplayRoleBasedOperations(roleId);
 
             Console.WriteLine("Enter command: ");
             string commandKey = Console.ReadLine();
@@ -98,7 +101,7 @@ public class Program
         }
     }
 
-    static void DisplayRoleOperations(int roleId)
+    static void DisplayRoleBasedOperations(int roleId)
     {
         switch (roleId)
         {
