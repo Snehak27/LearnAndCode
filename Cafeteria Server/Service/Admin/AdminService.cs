@@ -8,10 +8,12 @@ namespace CafeteriaServer.Service
     public class AdminService : IAdminService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly INotificationService _notificationService;
 
-        public AdminService(IUnitOfWork unitOfWork)
+        public AdminService(IUnitOfWork unitOfWork, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
+            _notificationService = notificationService;
         }
 
         public async Task<bool> AddMenu(MenuItemRequest menuItemRequest)
@@ -30,20 +32,7 @@ namespace CafeteriaServer.Service
             await _unitOfWork.MenuItems.Add(item);
             _unitOfWork.Save();
 
-            var employees = await _unitOfWork.Users.FindAll(u => u.RoleId == 3); 
-            foreach (var employee in employees)
-            {
-                var notification = new UserNotification
-                {
-                    UserId = employee.UserId,
-                    NotificationTypeId = 1, 
-                    MenuItemId = item.MenuItemId,
-                    IsRead = false,
-                    CreatedAt = DateTime.Now
-                };
-                await _unitOfWork.UserNotifications.Add(notification);
-            }
-            _unitOfWork.Save();
+            await _notificationService.NotifyEmployees(notificationTypeId: 1, item.MenuItemId);
 
             return true;
         }
@@ -75,20 +64,7 @@ namespace CafeteriaServer.Service
 
             if(notify)
             {
-                var employees = await _unitOfWork.Users.FindAll(u => u.RoleId == 3);
-                foreach (var employee in employees)
-                {
-                    var notification = new UserNotification
-                    {
-                        UserId = employee.UserId,
-                        NotificationTypeId = 2,
-                        MenuItemId = item.MenuItemId,
-                        IsRead = false,
-                        CreatedAt = DateTime.Now
-                    };
-                    await _unitOfWork.UserNotifications.Add(notification);
-                }
-                _unitOfWork.Save();
+                await _notificationService.NotifyEmployees(notificationTypeId:2, item.MenuItemId);
             }
 
             return true;

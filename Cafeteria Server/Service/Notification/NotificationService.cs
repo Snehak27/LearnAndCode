@@ -1,4 +1,5 @@
-﻿using CafeteriaServer.DTO;
+﻿using CafeteriaServer.DAL.Models;
+using CafeteriaServer.DTO;
 using CafeteriaServer.UnitofWork;
 using System;
 
@@ -58,6 +59,24 @@ namespace CafeteriaServer.Service
             {
                 //_unitOfWork.UserNotifications.Delete(notification);
                 notification.IsRead = true;
+            }
+            _unitOfWork.Save();
+        }
+
+        public async Task NotifyEmployees(int notificationTypeId, int? menuItemId = null)
+        {
+            var employees = await _unitOfWork.Users.FindAll(u => u.RoleId == 3);
+            foreach (var employee in employees)
+            {
+                var notification = new UserNotification
+                {
+                    UserId = employee.UserId,
+                    NotificationTypeId = notificationTypeId,
+                    MenuItemId = menuItemId,
+                    IsRead = false,
+                    CreatedAt = DateTime.Now
+                };
+                await _unitOfWork.UserNotifications.Add(notification);
             }
             _unitOfWork.Save();
         }

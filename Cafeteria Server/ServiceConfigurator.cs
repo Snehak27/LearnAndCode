@@ -48,6 +48,7 @@ namespace CafeteriaServer
             services.AddScoped<IRecommendationService, RecommendationService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<ISentimentAnalyzer, SentimentAnalyzer>();
+            services.AddScoped<ISharedMenuService, SharedMenuService>();
         }
     }
 }

@@ -7,29 +7,28 @@ using System;
 
 namespace CafeteriaServer.Commands
 {
-    public class SaveEmployeeOrdersCommand : ICommand
+    public class GetAllFeedbacksCommand : ICommand
     {
-        private readonly IEmployeeService _employeeService;
-        private readonly ILogger<SaveEmployeeOrdersCommand> _logger;
+        private readonly IChefService _chefService;
+        private readonly ILogger<GetAllFeedbacksCommand> _logger;
 
-
-        public SaveEmployeeOrdersCommand(IEmployeeService employeeService, ILogger<SaveEmployeeOrdersCommand> logger)
+        public GetAllFeedbacksCommand(IChefService chefService, ILogger<GetAllFeedbacksCommand> logger)
         {
-            _employeeService = employeeService;
+            _chefService = chefService;
             _logger = logger;
         }
 
         public async Task<string> Execute(string requestData)
         {
-            _logger.LogInformation("Save employee orders endpoint invoked");
+            _logger.LogInformation("Get feedbacks endpoint invoked");
 
-            var response = new ResponseMessage();
+            var response = new ViewFeedbackResponse();
 
             try
             {
-                var employeeResponseRequest = JsonConvert.DeserializeObject<EmployeeOderRequest>(requestData);
-                await _employeeService.SaveEmployeeOrders(employeeResponseRequest);
+                var feedbacks = await _chefService.GetAllFeedbacks();
                 response.IsSuccess = true;
+                response.Feedbacks = feedbacks;
             }
             catch (Exception ex)
             {

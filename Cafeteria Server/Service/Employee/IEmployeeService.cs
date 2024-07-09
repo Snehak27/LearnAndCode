@@ -10,7 +10,7 @@ namespace CafeteriaServer.Service
     {
         Task<bool> ProvideFeedback(FeedbackRequest feedbackRequest);
         Task<EmployeeRecommendationResponse> GetRecommendations(int userId);
-        Task SaveEmployeeOrder(EmployeeOderRequest employeeOrderRequest);
+        Task SaveEmployeeOrders(EmployeeOderRequest employeeOrderRequest);
         Task<List<PastOrderResponse>> GetPastOrders(int userId);
         Task<bool> UpdateEmployeePreference(UpdateProfileRequest request);
         Task<PreferenceResponse> GetEmployeePreference(int userId);

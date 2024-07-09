@@ -10,11 +10,13 @@ namespace CafeteriaServer.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRecommendationService _recommendationService;
+        private readonly INotificationService _notificationService;
 
-        public ChefService(IUnitOfWork unitOfWork, IRecommendationService recommendationService)
+        public ChefService(IUnitOfWork unitOfWork, IRecommendationService recommendationService, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _recommendationService = recommendationService;
+            _notificationService = notificationService;
         }
 
         public async Task<List<FeedbackResponse>> GetAllFeedbacks()
@@ -157,121 +159,7 @@ namespace CafeteriaServer.Service
             }
             _unitOfWork.Save();
 
-            var users = await _unitOfWork.Users.FindAll(u => u.RoleId == 3);
-            foreach (var user in users)
-            {
-                var userNotification = new UserNotification
-                {
-                    UserId = user.UserId,
-                    NotificationTypeId = 3,
-                    IsRead = false,
-                    CreatedAt = DateTime.Now,
-                    MenuItemId = null,
-                };
-                await _unitOfWork.UserNotifications.Add(userNotification);
-            }
-
-            _unitOfWork.Save();
-        }
-
-        public async Task<List<DiscardMenuItem>> GetDiscardMenuItems()
-        {
-            var allRecommendations = await _recommendationService.GetRecommendations();
-
-            var filteredRecommendations = allRecommendations
-                .SelectMany(r => r.Recommendations)
-                .GroupBy(r => r.MenuItemId)
-                .Select(g => new
-                {
-                    MenuItemId = g.Key,
-                    MenuItemName = g.First().MenuItemName,
-                    AverageRating = g.Average(r => r.AverageRating),
-                    Comments = g.SelectMany(r => r.Comments).ToList()
-                })
-                .ToList();
-
-            var discardItems = filteredRecommendations
-                .Where(item => item.AverageRating < 2)
-                .Select(item => new DiscardMenuItem
-                {
-                    MenuItemId = item.MenuItemId,
-                    MenuItemName = item.MenuItemName,
-                    AverageRating = item.AverageRating,
-                    Sentiments = item.Comments
-                })
-                .ToList();
-
-            return discardItems;
-        }
-
-        public async Task<bool> RemoveMenuItem(List<int> menuItemIds)
-        {
-            foreach (var menuItemId in menuItemIds)
-            {
-                var menuItem = await _unitOfWork.MenuItems.GetById(menuItemId);
-                if (menuItem != null)
-                {
-                    menuItem.IsDeleted = true;
-                    _unitOfWork.MenuItems.Update(menuItem);
-
-                    await AddDiscardedMenuItem(menuItem.ItemName, DateTime.Now);
-                }
-            }
-            _unitOfWork.Save();
-            return true;
-        }
-
-        private async Task AddDiscardedMenuItem(string menuItemName, DateTime discardDate)
-        {
-            var discardedMenuItem = new DiscardedMenuItem
-            {
-                MenuItemName = menuItemName,
-                DiscardDate = discardDate
-            };
-            await _unitOfWork.DiscardedMenuItems.Add(discardedMenuItem);
-            _unitOfWork.Save();
-        }
-
-        public async Task<bool> RequestDetailedFeedback(List<int> menuItemIds)
-        {
-            foreach (var menuItemId in menuItemIds)
-            {
-                var users = await _unitOfWork.Users.FindAll(u => u.RoleId == 3);
-                var menuItem = await _unitOfWork.MenuItems.GetById(menuItemId);
-
-                if (menuItem == null)
-                {
-                    return false;
-                }
-
-                foreach (var user in users)
-                {
-                    var userNotification = new UserNotification
-                    {
-                        UserId = user.UserId,
-                        NotificationTypeId = 4,
-                        IsRead = false,
-                        CreatedAt = DateTime.Now,
-                        MenuItemId = menuItemId,
-                    };
-                    await _unitOfWork.UserNotifications.Add(userNotification);
-                }
-
-                _unitOfWork.Save();
-            }
-            return true;
-        }
-
-        public async Task<DateTime?> GetLastDiscardDate()
-        {
-            var logs = await _unitOfWork.DiscardedMenuItems.GetAll();
-            var log = logs.OrderByDescending(l => l.DiscardDate).FirstOrDefault();
-            return log?.DiscardDate;
-        }
-
-        public async Task<List<DetailedFeedback>> GetAllDetailedFeedbacks()
-        {
-            return (await _unitOfWork.DetailedFeedbacks.GetAll()).ToList();
+            await _notificationService.NotifyEmployees(notificationTypeId: 3);
         }
     }
 }

@@ -2,14 +2,14 @@
 
 namespace CafeteriaServer.DTO.ResponseModel
 {
-    public class DetailedFeedbackResponse
+    public class DetailedFeedbacksResponse
     {
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; }
-        public List<DetailedFeedbackDTO> DetailedFeedbacks { get; set; }
+        public List<DetailedFeedbackResponse> DetailedFeedbacks { get; set; }
     }
 
-    public class DetailedFeedbackDTO
+    public class DetailedFeedbackResponse
     {
         public string MenuItemName { get; set; }
         public string FeedbackDate { get; set; }

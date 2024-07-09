@@ -135,7 +135,7 @@ namespace CafeteriaServer.Service
             }
         }
 
-        public async Task SaveEmployeeOrder(EmployeeOderRequest employeeOrderRequest)
+        public async Task SaveEmployeeOrders(EmployeeOderRequest employeeOrderRequest)
         {
             var employeeOrder = new Order
             {
