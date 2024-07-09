@@ -18,6 +18,7 @@ namespace CafeteriaClient
                     dispatcher.RegisterCommand("2", new UpdateMenuCommand());
                     dispatcher.RegisterCommand("3", new DeleteMenuCommand());
                     dispatcher.RegisterCommand("4", new ViewMenuCommand());
+                    dispatcher.RegisterCommand("5", new ViewDiscardMenuListCommand());
                     break;
 
                 case 2:
@@ -36,7 +37,7 @@ namespace CafeteriaClient
                     dispatcher.RegisterCommand("2", new ViewMenuCommand());
                     dispatcher.RegisterCommand("3", new SumitFeedbackCommand(getUserId));
                     dispatcher.RegisterCommand("4", new ViewEmployeeRecommendationsCommand(getUserId));
-                    dispatcher.RegisterCommand("5", new ProvideFeedbackCommand(getUserId));
+                    dispatcher.RegisterCommand("5", new SubmitDetailedFeedbackCommand(getUserId));
                     break;
 
                 default:

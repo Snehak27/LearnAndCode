@@ -58,7 +58,6 @@ namespace CafeteriaClient.Commands.Employee
 
             if(validChoice)
             {
-                // Update profile
                 Console.WriteLine("Please answer these questions to know your preferences");
 
                 int foodPreference = GetValidInput("1) Please select your food preference:", new string[] { "Vegetarian", "Non Vegetarian", "Eggetarian" });
@@ -97,7 +96,7 @@ namespace CafeteriaClient.Commands.Employee
 
         private void DisplayExistingPreferences(PreferenceResponse preference)
         {
-            Console.WriteLine("Your Preferences:");
+            Console.WriteLine("Profile:\n Your Preferences:");
             Console.WriteLine($"Food Preference: {preference.FoodPreference}");
             Console.WriteLine($"Spice Level: {preference.SpiceLevel}");
             Console.WriteLine($"Cuisine Preference: {preference.CuisinePreference}");

@@ -1,4 +1,5 @@
 ﻿using CafeteriaClient.DTO;
+using CafeteriaClient.Utils;
 using Newtonsoft.Json;
 using System;
 
@@ -93,21 +94,21 @@ namespace CafeteriaClient.Commands.Admin
                     newPrice = parsedPrice;
                 }
 
-                bool newAvailabilityStatus = GetBooleanInput($"Enter new availability status (true/false, leave blank to keep current):", menuItemToUpdate.AvailabilityStatus);
+                bool newAvailabilityStatus = UserInputHandler.GetBooleanInput($"Enter new availability status (true/false, leave blank to keep current):", menuItemToUpdate.AvailabilityStatus);
 
                 Console.WriteLine("Select new food type (leave blank to keep current):");
                 DisplayOptions(foodTypeOptions);
-                int newFoodTypeId = GetValidSelection(foodTypeOptions.Count, menuItemToUpdate.FoodTypeId);
+                int newFoodTypeId = UserInputHandler.GetValidSelection(foodTypeOptions.Count, menuItemToUpdate.FoodTypeId);
 
                 Console.WriteLine("Select new spice level (leave blank to keep current):");
                 DisplayOptions(spiceLevelOptions);
-                int newSpiceLevelId = GetValidSelection(spiceLevelOptions.Count, menuItemToUpdate.SpiceLevelId);
+                int newSpiceLevelId = UserInputHandler.GetValidSelection(spiceLevelOptions.Count, menuItemToUpdate.SpiceLevelId);
 
                 Console.WriteLine("Select new cuisine type (leave blank to keep current):");
                 DisplayOptions(cuisineTypeOptions);
-                int newCuisineTypeId = GetValidSelection(cuisineTypeOptions.Count, menuItemToUpdate.CuisineTypeId);
+                int newCuisineTypeId = UserInputHandler.GetValidSelection(cuisineTypeOptions.Count, menuItemToUpdate.CuisineTypeId);
 
-                bool newIsSweet = GetBooleanInput("Is it a sweet dish? (true/false, leave blank to keep current):", menuItemToUpdate.IsSweet);
+                bool newIsSweet = UserInputHandler.GetBooleanInput("Is it a sweet dish? (true/false, leave blank to keep current):", menuItemToUpdate.IsSweet);
 
                 var updateMenuItemRequest = new MenuItem
                 {
@@ -157,51 +158,6 @@ namespace CafeteriaClient.Commands.Admin
             {
                 Console.WriteLine($"{option.Key}) {option.Value}");
             }
-        }
-
-        private int GetValidSelection(int maxOption, int currentSelection)
-        {
-            int selection;
-            while (true)
-            {
-                string input = Console.ReadLine();
-                if (string.IsNullOrEmpty(input))
-                {
-                    return currentSelection;
-                }
-                if (int.TryParse(input, out selection) && selection > 0 && selection <= maxOption)
-                {
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine($"Invalid input. Please enter a number between 1 and {maxOption}.");
-                }
-            }
-            return selection;
-        }
-
-        private bool GetBooleanInput(string prompt, bool currentValue)
-        {
-            bool result = currentValue;
-            while (true)
-            {
-                Console.WriteLine(prompt);
-                string input = Console.ReadLine();
-                if (string.IsNullOrEmpty(input))
-                {
-                    return result;
-                }
-                if (bool.TryParse(input, out result))
-                {
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter 'true' or 'false'.");
-                }
-            }
-            return result;
         }
     }
 }

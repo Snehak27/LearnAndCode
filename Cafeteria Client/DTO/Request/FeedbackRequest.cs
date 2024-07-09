@@ -11,6 +11,7 @@ namespace CafeteriaClient.DTO.Request
         public int MealTypeId { get; set; }
         public int OrderItemId { get; set; }
     }
+
     public class PastOrderResponse
     {
         public int OrderId { get; set; }
