@@ -1,5 +1,6 @@
 ﻿using CafeteriaClient.DTO;
 using CafeteriaClient.DTO.Request;
+using CafeteriaClient.Enums;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -45,20 +46,20 @@ namespace CafeteriaClient.Commands
                 }
 
                 Console.WriteLine("Past Orders for the Last Week:");
-                Console.WriteLine("----------------------------------------------------------------------");
-                Console.WriteLine("| {0, -5} | {1, -30} | {2, -20} | {3, -10} |", "Sl No", "Menu Item", "Order Date", "Meal Type");
-                Console.WriteLine("----------------------------------------------------------------------");
+                Console.WriteLine("--------------------------------------------------------------------------------");
+                Console.WriteLine("| {0, -5} | {1, -30} | {2, -25} | {3, -10} ", "Sl No", "Menu Item", "Order Date", "Meal Type");
+                Console.WriteLine("--------------------------------------------------------------------------------");
 
                 int serialNumber = 1;
                 var orderMapping = new Dictionary<int, PastOrderResponse>();
                 foreach (var order in pastOrders)
                 {
                     orderMapping[serialNumber] = order;
-                    Console.WriteLine("| {0, -5} | {1, -30} | {2, -20} | {3, -10} |", serialNumber, order.MenuItemName, order.OrderDate, GetMealTypeName(order.MealTypeId));
+                    Console.WriteLine("| {0, -5} | {1, -30} | {2, -25} | {3, -10} ", serialNumber, order.MenuItemName, order.OrderDate, GetMealTypeName((MealType)order.MealTypeId));
                     serialNumber++;
                 }
 
-                Console.WriteLine("---------------------------------------------------------------");
+                Console.WriteLine("--------------------------------------------------------------------------------");
 
                 Console.WriteLine("Enter the serial number for which you want to provide feedback:");
                 int serialNo;
@@ -116,15 +117,9 @@ namespace CafeteriaClient.Commands
             }
         }
 
-        public static string GetMealTypeName(int mealTypeId)
+        private string GetMealTypeName(MealType mealType)
         {
-            return mealTypeId switch
-            {
-                1 => "Breakfast",
-                2 => "Lunch",
-                3 => "Dinner",
-                _ => "Unknown"
-            };
+            return Enum.GetName(typeof(MealType), mealType);
         }
     }
 }

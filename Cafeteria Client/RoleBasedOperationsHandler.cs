@@ -50,7 +50,7 @@ namespace CafeteriaClient
             switch (roleId)
             {
                 case 1:
-                    Console.WriteLine("\nAdmin operations:");
+                    Console.WriteLine("\nAdmin Menu:");
                     Console.WriteLine("1) Add menu");
                     Console.WriteLine("2) Update menu");
                     Console.WriteLine("3) Delete menu");
@@ -60,7 +60,7 @@ namespace CafeteriaClient
                     break;
 
                 case 2:
-                    Console.WriteLine("\nChef operations:");
+                    Console.WriteLine("\nChef Menu:");
                     Console.WriteLine("1) View Menu");
                     Console.WriteLine("2) View Employee Feedback");
                     Console.WriteLine("3) View Monthly Feedback report");
@@ -71,7 +71,7 @@ namespace CafeteriaClient
                     break;
 
                 case 3:
-                    Console.WriteLine("\nEmployee operations:");
+                    Console.WriteLine("\nEmployee Menu:");
                     Console.WriteLine("1) View Profile");
                     Console.WriteLine("2) View Menu");
                     Console.WriteLine("3) Give Feedback");

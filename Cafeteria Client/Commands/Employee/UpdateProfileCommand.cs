@@ -96,7 +96,7 @@ namespace CafeteriaClient.Commands.Employee
 
         private void DisplayExistingPreferences(PreferenceResponse preference)
         {
-            Console.WriteLine("Profile:\n Your Preferences:");
+            Console.WriteLine("\nProfile:\nYour Preferences:");
             Console.WriteLine($"Food Preference: {preference.FoodPreference}");
             Console.WriteLine($"Spice Level: {preference.SpiceLevel}");
             Console.WriteLine($"Cuisine Preference: {preference.CuisinePreference}");

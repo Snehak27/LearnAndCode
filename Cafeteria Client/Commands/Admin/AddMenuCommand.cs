@@ -1,4 +1,5 @@
 ﻿using CafeteriaClient.DTO;
+using CafeteriaClient.Enums;
 using CafeteriaClient.Utils;
 using Newtonsoft.Json;
 using System;
@@ -35,37 +36,16 @@ namespace CafeteriaClient.Commands
             bool availabilityStatus = UserInputHandler.GetBooleanInput("Enter availability status (true/false, leave blank to default to false):");
 
             Console.WriteLine("Select food type:");
-            var foodTypeOptions = new Dictionary<int, string>
-            {
-                { 1, "Vegetarian" },
-                { 2, "Non-Vegetarian" },
-                { 3, "Eggetarian" }
-            };
-            DisplayOptions(foodTypeOptions);
-            int foodTypeId = UserInputHandler.GetValidSelection(foodTypeOptions.Count);
+            DisplayOptions<FoodType>();
+            FoodType foodType = (FoodType)UserInputHandler.GetValidSelection(Enum.GetValues(typeof(FoodType)).Length);
 
-            // Display options and get the selection for spice level
             Console.WriteLine("Select spice level:");
-            var spiceLevelOptions = new Dictionary<int, string>
-            {
-                { 1, "High" },
-                { 2, "Medium" },
-                { 3, "Low" }
-            };
-            DisplayOptions(spiceLevelOptions);
-            int spiceLevelId = UserInputHandler.GetValidSelection(spiceLevelOptions.Count);
+            DisplayOptions<SpiceLevel>();
+            SpiceLevel spiceLevel = (SpiceLevel)UserInputHandler.GetValidSelection(Enum.GetValues(typeof(SpiceLevel)).Length);
 
-
-            // Display options and get the selection for cuisine type
             Console.WriteLine("Select cuisine type:");
-            var cuisineTypeOptions = new Dictionary<int, string>
-            {
-                { 1, "North Indian" },
-                { 2, "South Indian" },
-                { 3, "Other" }
-            };
-            DisplayOptions(cuisineTypeOptions);
-            int cuisineTypeId = UserInputHandler.GetValidSelection(cuisineTypeOptions.Count);
+            DisplayOptions<CuisineType>();
+            CuisineType cuisineType = (CuisineType)UserInputHandler.GetValidSelection(Enum.GetValues(typeof(CuisineType)).Length);
 
             bool isSweet = UserInputHandler.GetBooleanInput("Is it a sweet dish? (true/false, leave blank to default to false):");
 
@@ -74,9 +54,9 @@ namespace CafeteriaClient.Commands
                 ItemName = itemName,
                 Price = price,
                 AvailabilityStatus = availabilityStatus,
-                FoodTypeId = foodTypeId,
-                SpiceLevelId = spiceLevelId,
-                CuisineTypeId = cuisineTypeId,
+                FoodTypeId = (int)foodType,
+                SpiceLevelId = (int)spiceLevel,
+                CuisineTypeId = (int)cuisineType,
                 IsSweet = isSweet
             };
 
@@ -101,11 +81,12 @@ namespace CafeteriaClient.Commands
             }
         }
 
-        private void DisplayOptions(Dictionary<int, string> options)
+        private void DisplayOptions<T>() where T : Enum
         {
-            foreach (var option in options)
+            var values = Enum.GetValues(typeof(T)).Cast<T>();
+            foreach (var value in values)
             {
-                Console.WriteLine($"{option.Key}) {option.Value}");
+                Console.WriteLine($"{(int)(object)value}) {value}");
             }
         }
     }

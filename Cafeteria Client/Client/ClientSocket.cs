@@ -24,7 +24,7 @@ namespace CafeteriaClient
             await _stream.WriteAsync(requestBytes, 0, requestBytes.Length);
             await _stream.FlushAsync(); 
 
-            byte[] responseBytes = new byte[4096];
+            byte[] responseBytes = new byte[32768];
             int bytesRead = await _stream.ReadAsync(responseBytes, 0, responseBytes.Length);
             string responseJson = Encoding.ASCII.GetString(responseBytes, 0, bytesRead);
 

@@ -12,7 +12,7 @@ public class Program
 
         while (true)
         {
-            var clientSocket = new ClientSocket("192.168.1.3", port);
+            var clientSocket = new ClientSocket("192.168.4.244", port);
             var dispatcher = new CommandDispatcher();
             var commandRegistrar = new CommandRegistrar();
             var roleBasedOperationsHandler = new RoleBasedOperationsHandler(dispatcher, commandRegistrar, userSessionManager, clientSocket);

@@ -1,5 +1,6 @@
 ﻿using CafeteriaClient.DTO;
 using CafeteriaClient.DTO.Request;
+using CafeteriaClient.Enums;
 using Newtonsoft.Json;
 using System;
 
@@ -92,12 +93,12 @@ namespace CafeteriaClient.Commands
             Console.WriteLine("Recommendations:");
             foreach (var mealTypeRecommendation in recommendationsResponse.MealTypeRecommendations)
             {
-                string mealTypeName = GetMealTypeName(mealTypeRecommendation.MealTypeId);
+                string mealTypeName = GetMealTypeName((MealType)mealTypeRecommendation.MealTypeId);
                 Console.WriteLine($"\n{mealTypeName}:");
-                Console.WriteLine("---------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------");
                 Console.WriteLine("| {0, -10} | {1, -20} | {2, -20} | {3, -15} | {4, -10} | {5, -10} | {6, -30} ",
                     "Sl No.", "Name", "Overall Rating", "No. of Votes", "Avg Rating", "Sentiment", "Comments");
-                Console.WriteLine("---------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------");
 
                 for (int i = 0; i < mealTypeRecommendation.Recommendations.Count; i++)
                 {
@@ -107,16 +108,16 @@ namespace CafeteriaClient.Commands
                         recommendation.AverageRating, recommendation.OverallSentiment, string.Join(", ", recommendation.Comments));
                 }
 
-                Console.WriteLine("---------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------");
             }
         }
 
         private void DisplayMenu(ViewMenuItemsResponse menuResponse)
         {
             Console.WriteLine("\nFull Menu Items:");
-            Console.WriteLine("----------------------------------------------------------------------------------");
+            Console.WriteLine("---------------------------------------------------------------------------");
             Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} ", "Sl No.", "Name", "Price");
-            Console.WriteLine("-----------------------------------------------------------------------------------");
+            Console.WriteLine("---------------------------------------------------------------------------");
 
             for (int i = 0; i < menuResponse.MenuItems.Count; i++)
             {
@@ -124,7 +125,7 @@ namespace CafeteriaClient.Commands
                 Console.WriteLine("| {0, -10} | {1, -20} | {2, 10}  ", (i + 1), menuItem.ItemName, menuItem.Price);
             }
 
-            Console.WriteLine("-----------------------------------------------------------------------------------");
+            Console.WriteLine("---------------------------------------------------------------------------");
         }
 
         private List<MealTypeMenuItemList> SelectMenuItems(RecommendationResponse recommendationsResponse, ViewMenuItemsResponse menuResponse)
@@ -134,7 +135,7 @@ namespace CafeteriaClient.Commands
             foreach (var mealTypeRecommendation in recommendationsResponse.MealTypeRecommendations)
             {
                 var selectedMenuItemIds = new List<int>();
-                string mealTypeName = GetMealTypeName(mealTypeRecommendation.MealTypeId);
+                string mealTypeName = GetMealTypeName((MealType)mealTypeRecommendation.MealTypeId);
 
                 // Select recommended items
                 while (true)
@@ -218,24 +219,17 @@ namespace CafeteriaClient.Commands
 
                 selectedMealTypeMenuItems.Add(new MealTypeMenuItemList
                 {
-                    MealTypeId = mealTypeRecommendation.MealTypeId,
+                    MealTypeId = (int)mealTypeRecommendation.MealTypeId,
                     MenuItemIds = selectedMenuItemIds
                 });
-                
             }
 
             return selectedMealTypeMenuItems;
         }
 
-        private string GetMealTypeName(int mealTypeId)
+        private string GetMealTypeName(MealType mealType)
         {
-            return mealTypeId switch
-            {
-                1 => "Breakfast",
-                2 => "Lunch",
-                3 => "Dinner",
-                _ => "Unknown Meal Type"
-            };
+            return Enum.GetName(typeof(MealType), mealType);
         }
     }
 }

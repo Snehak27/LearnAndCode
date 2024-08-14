@@ -45,7 +45,6 @@ namespace CafeteriaClient.Commands.Admin
                 return;
             }
 
-            // Get the ID of the selected menu item
             int itemIdToDelete = response.MenuItems[itemNumberToDelete - 1].MenuItemId;
 
             string requestJson = JsonConvert.SerializeObject(itemIdToDelete);

@@ -25,14 +25,14 @@ namespace CafeteriaClient.Commands
                 var itemMapping = new Dictionary<int, int>();
                 int serialNo = 1;
 
-                Console.WriteLine("----------------------------------------------------------------------------");
+                Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------");
                 Console.WriteLine("| {0, -5} | {1, -20} | {2, -15} | {3, -40} ", "Sl No", "Food Item", "Avg Rating", "Sentiments");
-                Console.WriteLine("---------------------------------------------------------------");
+                Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------");
                 foreach (var item in response.DiscardItems)
                 {
                     itemMapping[serialNo] = item.MenuItemId;
-                    Console.WriteLine("| {0, -5} | {1, -20} | {2, -15} | {3, -40} ", serialNo, item.MenuItemName, item.AverageRating, string.Join(", ", item.Sentiments));
-                    Console.WriteLine("-----------------------------------------------------------------------------");
+                    Console.WriteLine("| {0, -5} | {1, -20} | {2, -15:F2} | {3, -40} ", serialNo, item.MenuItemName, item.AverageRating, string.Join(", ", item.Sentiments));
+                    Console.WriteLine("----------------------------------------------------------------------------------------------------------------------------");
                     serialNo++;
                 }
 
@@ -109,7 +109,6 @@ namespace CafeteriaClient.Commands
                 RequestData = JsonConvert.SerializeObject(new DiscardActionRequest
                 {
                     Action = action,
-                    //MenuItemId = menuItemId
                     MenuItemIds = menuItemIds
                 })
             };

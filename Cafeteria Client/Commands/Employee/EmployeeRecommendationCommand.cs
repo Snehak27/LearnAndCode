@@ -43,8 +43,8 @@ namespace CafeteriaClient.Commands.Employee
                         string input = Console.ReadLine();
                         if (string.IsNullOrWhiteSpace(input))
                         {
-                            Console.WriteLine("Input cannot be empty. Please enter valid serial numbers.");
-                            continue;
+                            Console.WriteLine("Invalid Selection");
+                            return;
                         }
 
                         string[] itemNumbers = input.Split(',');
@@ -124,18 +124,22 @@ namespace CafeteriaClient.Commands.Employee
             foreach (var mealTypeRecommendation in response.MealTypeRecommendations)
             {
                 Console.WriteLine($"\n{mealTypeRecommendation.MealTypeName}:");
-                Console.WriteLine("-------------------------------------------------------------------------------------------------------------");
-                Console.WriteLine("| {0, -10} | {1, -30} | {2, 20} |{3, -20} |{4, -20}", "Sl No.", "Name", "Overall Rating", "Comments", "Sentiment");
-                Console.WriteLine("-----------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("| {0, -10} | {1, -30} | {2, -20} | {3, -20} | {4, -55}", "Sl No.", "Name", "Overall Rating", "Sentiment", "Comments" );
+                Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------------------------");
 
                 foreach (var recommendedItem in mealTypeRecommendation.RecommendedItems)
                 {
-                    Console.WriteLine("| {0, -10} | {1, -30} | {2, 20:F2} | {3, -20} | {4, -20} ", serialNo, recommendedItem.MenuItemName, recommendedItem.PredictedRating, string.Join(", ", recommendedItem.Comments), recommendedItem.OverallSentiment);
+                    Console.WriteLine("| {0, -10} | {1, -30} | {2, -20:F2} | {3, -20} | {4, -55} ", serialNo, recommendedItem.MenuItemName, recommendedItem.PredictedRating, recommendedItem.OverallSentiment, string.Join(", ", recommendedItem.Comments));
                     menuItemMapping[serialNo] = (recommendedItem.MenuItemId, mealTypeRecommendation.MealTypeId, recommendedItem.RecommendedItemId);
                     serialNo++;
                 }
-                Console.WriteLine("------------------------------------------------------------------------------------------------------------");
-                Console.WriteLine($"Recommended item: {mealTypeRecommendation.TopRecommendedItem.MenuItemName}");
+                Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------------------------");
+
+                if (mealTypeRecommendation.TopRecommendedItem != null)
+                {
+                    Console.WriteLine($"Recommended item: {mealTypeRecommendation.TopRecommendedItem.MenuItemName}");
+                }
             }
 
             return menuItemMapping;

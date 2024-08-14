@@ -1,4 +1,5 @@
 ﻿using CafeteriaClient.DTO;
+using CafeteriaClient.Enums;
 using Newtonsoft.Json;
 using System;
 
@@ -36,7 +37,8 @@ namespace CafeteriaClient.Commands
                     int serialNumber = 1;
                     foreach (var menuItem in response.MenuItems)
                     {
-                        Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3, -15} | {4,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, GetOptionName(foodTypeOptions, menuItem.FoodTypeId), menuItem.AvailabilityStatus);
+                        Console.WriteLine("| {0, -10} | {1, -20} | {2, 10} | {3, -15} | {4,-20} ", serialNumber, menuItem.ItemName, menuItem.Price, GetFoodTypeName((FoodType)menuItem.FoodTypeId), menuItem.AvailabilityStatus);
+
                         serialNumber++;
                     }
 
@@ -53,9 +55,9 @@ namespace CafeteriaClient.Commands
             }
         }
 
-        private string GetOptionName(Dictionary<int, string> options, int id)
+        private string GetFoodTypeName(FoodType foodType)
         {
-            return options.ContainsKey(id) ? options[id] : "Unknown";
+            return Enum.GetName(typeof(FoodType), foodType);
         }
     }
 }

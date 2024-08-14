@@ -46,7 +46,7 @@ namespace CafeteriaClient.Commands.Employee
             }
             Console.WriteLine("----------------------------------------------------------");
 
-            int selectedItem = GetValidInput("Enter Sl No of the Menu Item for which you want to provide feedback::", itemMapping.Keys.ToArray());
+            int selectedItem = GetValidInput("Enter Sl No of the Menu Item for which you want to provide feedback:", itemMapping.Keys.ToArray());
 
             if (itemMapping.TryGetValue(selectedItem, out int menuItemId))
             {
