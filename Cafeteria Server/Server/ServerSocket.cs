@@ -23,7 +23,7 @@ namespace CafeteriaServer.Server
         {
             try
             {
-                listener = new TcpListener(IPAddress.Parse("192.168.1.3"), port);
+                listener = new TcpListener(IPAddress.Parse("192.168.4.244"), port);
                 listener.Start();
                 Console.WriteLine($"Server started. Listening on port {port}...");
 
@@ -50,7 +50,7 @@ namespace CafeteriaServer.Server
             try
             {
                 NetworkStream stream = client.GetStream();
-                byte[] buffer = new byte[4096]; 
+                byte[] buffer = new byte[32768]; 
 
                 while (client.Connected)
                 {

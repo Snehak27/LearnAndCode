@@ -123,7 +123,7 @@ namespace CafeteriaServer.Service
                     MealTypeId = mealTypeRecommendation.MealTypeId,
                     Recommendations = mealTypeRecommendation.Recommendations
                         .OrderByDescending(r => r.PredictedRating)
-                        .Take(3) 
+                        .Take(4) 
                         .ToList()
                 };
 

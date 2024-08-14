@@ -8,6 +8,7 @@ namespace CafeteriaServer.DTO
         public string ErrorMessage { get; set; }
         public List<EmployeeOrderSummary> EmployeeOrders { get; set; }
     }
+
     public class EmployeeOrderSummary
     {
         public int MealTypeId { get; set; }

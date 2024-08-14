@@ -56,8 +56,10 @@ namespace CafeteriaServer.Service
                 var menuItem = await _unitOfWork.MenuItems.GetById(menuItemId);
                 if (menuItem != null)
                 {
-                    menuItem.IsDeleted = true;
-                    _unitOfWork.MenuItems.Update(menuItem);
+                    //menuItem.IsDeleted = true;
+                    //_unitOfWork.MenuItems.Update(menuItem);
+                    await _notificationService.RemoveNotifications(menuItemId);
+                    _unitOfWork.MenuItems.Delete(menuItem);
 
                     await AddDiscardedMenuItem(menuItem.ItemName, DateTime.Now);
                 }

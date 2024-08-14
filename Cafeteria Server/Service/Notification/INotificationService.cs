@@ -7,5 +7,6 @@ namespace CafeteriaServer.Service
     {
         Task<IEnumerable<NotificationResponse>> GetUnreadNotifications(int userId);
         Task NotifyEmployees(int notificationTypeId, int? menuItemId = null);
+        Task RemoveNotifications(int menuItemId);
     }
 }

@@ -7,12 +7,12 @@ using System;
 
 namespace CafeteriaServer.Commands
 {
-    public class GetFeedbackReportCommand : ICommand
+    public class GetChefRecommendationsCommand : ICommand
     {
         private readonly IChefService _chefService;
-        private readonly ILogger<GetFeedbackReportCommand> _logger;
+        private readonly ILogger<GetChefRecommendationsCommand> _logger;
 
-        public GetFeedbackReportCommand(IChefService chefService, ILogger<GetFeedbackReportCommand> logger)
+        public GetChefRecommendationsCommand(IChefService chefService, ILogger<GetChefRecommendationsCommand> logger)
         {
             _chefService = chefService;
             _logger = logger;
@@ -20,16 +20,15 @@ namespace CafeteriaServer.Commands
 
         public async Task<string> Execute(string requestData)
         {
-            _logger.LogInformation("Get feedback report endpoint invoked");
+            _logger.LogInformation("Get chef recommendations endpoint invoked");
 
-            var request = JsonConvert.DeserializeObject<MonthlyFeedbackReportRequest>(requestData);
-            var response = new MonthlyFeedbackReportResponse();
+            var response = new RecommendationResponse();
 
             try
             {
-                var report = await _chefService.GetMonthlyFeedbackReport(request);
+                var mealTypeRecommendations = await _chefService.GetRecommendations();
                 response.IsSuccess = true;
-                response.Report = report.Report;
+                response.MealTypeRecommendations = mealTypeRecommendations;
             }
             catch (Exception ex)
             {

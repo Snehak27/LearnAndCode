@@ -78,6 +78,8 @@ namespace CafeteriaServer.Service
                 throw new KeyNotFoundException("Menu item not found.");
             }
 
+            await _notificationService.RemoveNotifications(item.MenuItemId);
+
             _unitOfWork.MenuItems.Delete(item);
             _unitOfWork.Save();
 

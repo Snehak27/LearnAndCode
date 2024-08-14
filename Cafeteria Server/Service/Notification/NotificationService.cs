@@ -80,5 +80,16 @@ namespace CafeteriaServer.Service
             }
             _unitOfWork.Save();
         }
+
+        public async Task RemoveNotifications(int menuItemId)
+        {
+            var notifications = await _unitOfWork.UserNotifications.FindAll(n => n.MenuItemId == menuItemId);
+            foreach (var notification in notifications)
+            {
+                _unitOfWork.UserNotifications.Delete(notification);
+                //notification.IsRead = true;
+            }
+            _unitOfWork.Save();
+        }
     }
 }
