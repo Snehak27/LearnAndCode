@@ -56,8 +56,8 @@ namespace CafeteriaServer.Tests
             var breakfastRecommendations = result.First(r => r.MealTypeId == 1).Recommendations;
             var lunchRecommendations = result.First(r => r.MealTypeId == 2).Recommendations;
 
-            //Assert.Single(breakfastRecommendations);
-            //Assert.Single(lunchRecommendations);
+            Assert.Single(breakfastRecommendations);
+            Assert.Single(lunchRecommendations);
 
             var breakfastItem = breakfastRecommendations.First();
             var lunchItem = lunchRecommendations.First();

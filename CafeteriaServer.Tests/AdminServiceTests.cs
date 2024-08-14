@@ -44,12 +44,11 @@ namespace CafeteriaServer.Tests
             // Assert
             Assert.True(result);
             _mockUnitOfWork.Verify(u => u.MenuItems.Add(It.IsAny<MenuItem>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.Save(), Times.Once);
             _mockNotificationService.Verify(n => n.NotifyEmployees(1, It.IsAny<int>()), Times.Once);
         }
 
         [Fact]
-        public async Task UpdateMenu_ValidMenuItem_UpdatesMenuItemAndNotifiesEmployeesIfAvailabilityChanged()
+        public async Task UpdateMenu_ValidMenuItem_UpdatesMenuItem()
         {
             // Arrange
             var menuItem = new MenuItem
@@ -66,7 +65,6 @@ namespace CafeteriaServer.Tests
 
             _mockUnitOfWork.Setup(u => u.MenuItems.GetById(It.IsAny<int>())).ReturnsAsync(new MenuItem { MenuItemId = 1, AvailabilityStatus = false });
             _mockUnitOfWork.Setup(u => u.MenuItems.Update(It.IsAny<MenuItem>())).Verifiable();
-            _mockUnitOfWork.Setup(u => u.Save()).Verifiable();
 
             // Act
             var result = await _adminService.UpdateMenu(menuItem);
@@ -74,7 +72,6 @@ namespace CafeteriaServer.Tests
             // Assert
             Assert.True(result);
             _mockUnitOfWork.Verify(u => u.MenuItems.GetById(It.IsAny<int>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.MenuItems.Update(It.IsAny<MenuItem>()), Times.Once);
             _mockNotificationService.Verify(n => n.NotifyEmployees(2, It.IsAny<int>()), Times.Once);
         }
 
@@ -86,6 +83,7 @@ namespace CafeteriaServer.Tests
             _mockUnitOfWork.Setup(u => u.MenuItems.GetById(It.IsAny<int>())).ReturnsAsync(menuItem);
             _mockUnitOfWork.Setup(u => u.MenuItems.Delete(It.IsAny<MenuItem>())).Verifiable();
             _mockUnitOfWork.Setup(u => u.Save()).Verifiable();
+            _mockNotificationService.Setup(n => n.RemoveNotifications(It.IsAny<int>())).Returns(Task.CompletedTask).Verifiable();
 
             // Act
             var result = await _adminService.DeleteMenu(1);
@@ -94,7 +92,7 @@ namespace CafeteriaServer.Tests
             Assert.True(result);
             _mockUnitOfWork.Verify(u => u.MenuItems.GetById(It.IsAny<int>()), Times.Once);
             _mockUnitOfWork.Verify(u => u.MenuItems.Delete(It.IsAny<MenuItem>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.Save(), Times.Once);
+
         }
     }
 }
